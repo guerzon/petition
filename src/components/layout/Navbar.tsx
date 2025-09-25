@@ -21,18 +21,12 @@ const mainNavigation = [
   },
   {
     label: 'Start a Petition',
-    href: '/start-a-petition',
+    href: '/create',
     children: [],
   },
   {
     label: 'How it Works',
     href: '/how-it-works',
-    children: [],
-  },
-
-  {
-    label: 'About',
-    href: '/about',
     children: [],
   },
 ]
@@ -117,10 +111,8 @@ const Navbar: React.FC = () => {
                 className="h-12 w-12 mr-3"
               />
               <div>
-                <div className="text-black font-bold">BetterGov.ph</div>
-                <div className="text-xs text-gray-800">
-                  A community-run portal for the Philippines
-                </div>
+                <div className="text-black font-bold">Petitions by BetterGov.ph</div>
+                <div className="text-xs text-gray-800">Change starts here</div>
               </div>
             </Link>
           </div>
@@ -134,7 +126,7 @@ const Navbar: React.FC = () => {
                   className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
                 >
                   {t(item.label)}
-                  {item.children && (
+                  {item.children && item.children.length > 0 && (
                     <ChevronDown className="ml-1 h-4 w-4 text-gray-800 group-hover:text-primary-600 transition-colors" />
                   )}
                 </Link>
@@ -159,24 +151,12 @@ const Navbar: React.FC = () => {
           </div>
           <div className="hidden lg:flex items-center space-x-6">
             <Link
-              to="/about"
-              className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
-            >
-              About
-            </Link>
-            <Link
               to="/search"
               className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
               <Search className="h-4 w-4 mr-1" />
               Search
             </Link>
-            {/* <Link
-              to="/sitemap"
-              className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
-            >
-              Sitemap
-            </Link> */}
           </div>
 
           {/* Mobile menu button */}

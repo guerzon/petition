@@ -1,6 +1,7 @@
 import Navbar from './components/layout/Navbar'
 import Hero from './components/Hero'
 import PetitionsList from './components/PetitionsList'
+import CreatePetition from './components/CreatePetition'
 import Footer from './components/layout/Footer'
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -21,6 +22,7 @@ function App() {
                 </>
               }
             />
+            <Route path="/create" element={<CreatePetition />} />
           </Routes>
         </main>
         <Footer />

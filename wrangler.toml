@@ -1,0 +1,25 @@
+name = "petition-app"
+compatibility_date = "2024-09-25"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "petition-db"
+database_id = "4fd4c724-020d-4eed-b3e7-959c8f38a786"
+
+[env.production]
+name = "petition-app-prod"
+
+[env.production.d1_databases]
+binding = "DB"
+database_name = "petition-db-prod"
+database_id = ""
+
+[env.staging]
+name = "petition-app-staging"
+
+[env.staging.d1_databases]
+binding = "DB"
+database_name = "petition-db-staging"
+database_id = ""
