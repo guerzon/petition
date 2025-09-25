@@ -1,0 +1,172 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+// import { useTranslation } from 'react-i18next';
+import {
+  SiFacebook,
+  SiInstagram,
+  SiYoutube,
+  SiX,
+  SiDiscord,
+} from '@icons-pack/react-simple-icons';
+
+export const footerNavigation = {
+  mainSections: [
+    {
+      title: 'About',
+      links: [
+        { label: 'About the Portal', href: '/about' },
+        { label: 'Project Ideas', href: '/ideas' },
+        { label: 'Accessibility', href: '/accessibility' },
+        { label: 'Terms of Use', href: '/terms-of-service' },
+        { label: 'Contact Us', href: '/about' },
+      ],
+    },
+    {
+      title: 'Services',
+      links: [
+        { label: 'All Services', href: '/services' },
+        { label: 'Service Directory', href: '/services' },
+        { label: 'Websites', href: '/services/websites' },
+        { label: 'Forex', href: '/data/forex' },
+        { label: 'Weather', href: '/data/weather' },
+        { label: 'Hotlines', href: '/philippines/hotlines' },
+        { label: 'Holidays', href: '/philippines/holidays' },
+        { label: 'Flood Control Projects', href: '/flood-control-projects' },
+      ],
+    },
+    {
+      title: 'Government',
+      links: [
+        { label: 'Official Gov.ph', href: 'https://gov.ph' },
+        { label: 'Open Data', href: 'https://data.gov.ph' },
+        { label: 'Freedom of Information', href: 'https://www.foi.gov.ph' },
+        {
+          label: 'Contact Center',
+          href: 'https://contactcenterngbayan.gov.ph',
+        },
+        {
+          label: 'Official Gazette',
+          href: 'https://www.officialgazette.gov.ph',
+        },
+      ],
+    },
+  ],
+  socialLinks: [
+    { label: 'Facebook', href: 'https://facebook.com/bettergovph' },
+    { label: 'Discord', href: '/discord' },
+    // { label: 'Instagram', href: 'https://instagram.com/govph' },
+    // { label: 'YouTube', href: 'https://youtube.com/govph' },
+  ],
+};
+
+const Footer: React.FC = () => {
+  // const { t } = useTranslation('common');
+
+  const getSocialIcon = (label: string) => {
+    switch (label) {
+      case 'Facebook':
+        return <SiFacebook className='h-5 w-5' />;
+      case 'Twitter':
+        return <SiX className='h-5 w-5' />;
+      case 'Instagram':
+        return <SiInstagram className='h-5 w-5' />;
+      case 'YouTube':
+        return <SiYoutube className='h-5 w-5' />;
+      case 'Discord':
+        return <SiDiscord className='h-5 w-5' />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <footer className='bg-gray-900 text-white'>
+      <div className='container mx-auto px-4 pt-12 pb-8'>
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8'>
+          <div>
+            <div className='flex items-center mb-4'>
+              <img
+                src='/logos/svg/BetterGov_Icon-White.svg'
+                alt='BetterGov Logo'
+                className='h-12 w-12 mr-3'
+              />
+
+              <div>
+                <div className='font-bold'>Better Philippines</div>
+                <div className='text-xs text-gray-400'>BetterGov.ph Portal</div>
+              </div>
+            </div>
+            <p className='text-gray-400 text-sm mb-4'>
+              A community portal providing Philippine citizens, businesses, and
+              visitors with information and services.
+            </p>
+            <div className='flex space-x-4'>
+              {footerNavigation.socialLinks.map(link => (
+                <Link
+                  key={link.label}
+                  to={link.href}
+                  className='text-gray-400 hover:text-white transition-colors'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                >
+                  {getSocialIcon(link.label)}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {footerNavigation.mainSections.map(section => (
+            <div key={section.title}>
+              <h3 className='text-lg font-semibold mb-4'>{section.title}</h3>
+              <ul className='space-y-2'>
+                {section.links.map(link => (
+                  <li key={link.label}>
+                    <Link
+                      to={link.href}
+                      className='text-gray-400 hover:text-white text-sm transition-colors'
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        <div className='flex justify-center my-24'>
+          <p className='text-white text-sm md:text-lg bg-gray-800 p-4 px-12 md:px-8 rounded-full border border-gray-700'>
+            Cost to build this site to date:{' '}
+            <span className='animate-pulse text-red-500'>₱3,000</span>. Cost to
+            the People of the Philippines:{' '}
+            <span className='text-green-500'>₱0</span>.
+          </p>
+        </div>
+
+        <div className='border-t border-gray-800 mt-8 pt-8'>
+          <div className='flex flex-col md:flex-row justify-between items-center'>
+            <p className='text-gray-400 text-sm mb-4 md:mb-0'>
+              Copyright © {new Date().getFullYear()} BetterGov.ph. All rights reserved.
+            </p>
+            <div className='flex space-x-6'>
+              <Link
+                to='https://github.com/bettergovph/bettergov'
+                className='text-gray-400 hover:text-white text-sm transition-colors'
+              >
+                Contribute at GitHub
+              </Link>
+              <Link
+                to='/sitemap'
+                className='text-gray-400 hover:text-white text-sm transition-colors'
+              >
+                Sitemap
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
