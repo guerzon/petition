@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import { Card } from './ui/card'
 import { Button } from './ui/button'
 import { Input } from './ui/input'
-import { Textarea } from './ui/textarea'
+import { Badge } from './ui/badge'
 import { petitionApi, categoryApi, userApi, ApiError } from '../services/api'
 import type { Category } from '../types/api'
+import MDEditor from '@uiw/react-md-editor'
 
 interface CreatePetitionFormData {
   title: string
@@ -14,6 +15,7 @@ interface CreatePetitionFormData {
   location: string
   targetCount: number
   imageUrl: string
+  imageFile: File | null
   categories: number[]
 }
 
@@ -28,6 +30,7 @@ export default function CreatePetition() {
     location: '',
     targetCount: 1000,
     imageUrl: '',
+    imageFile: null,
     categories: [],
   })
 
@@ -113,8 +116,8 @@ export default function CreatePetition() {
 
     if (!formData.description.trim()) {
       newErrors.description = 'Description is required'
-    } else if (formData.description.length < 50) {
-      newErrors.description = 'Description must be at least 50 characters long'
+    } else if (formData.description.length < 100) {
+      newErrors.description = 'Description must be at least 100 characters long'
     }
 
     if (formData.type === 'local' && !formData.location.trim()) {
@@ -125,9 +128,7 @@ export default function CreatePetition() {
       newErrors.targetCount = 'Target signature count must be at least 1'
     }
 
-    if (formData.imageUrl && !isValidUrl(formData.imageUrl)) {
-      newErrors.imageUrl = 'Please enter a valid image URL'
-    }
+    // Image validation is handled during file upload
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -144,7 +145,7 @@ export default function CreatePetition() {
 
   const handleInputChange = (
     field: keyof CreatePetitionFormData,
-    value: string | number | string[]
+    value: string | number | string[] | File | null
   ) => {
     setFormData(prev => ({
       ...prev,
@@ -158,6 +159,31 @@ export default function CreatePetition() {
         [field]: undefined,
       }))
     }
+  }
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Check file size (5MB limit)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, imageUrl: 'Image size must be less than 5MB' }))
+      return
+    }
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, imageUrl: 'Please select a valid image file' }))
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      const base64String = event.target?.result as string
+      handleInputChange('imageUrl', base64String)
+      handleInputChange('imageFile', file)
+    }
+    reader.readAsDataURL(file)
   }
 
   const handleCategoryToggle = (categoryId: number) => {
@@ -258,49 +284,66 @@ export default function CreatePetition() {
               <label className="text-base font-medium text-gray-900">
                 What type of petition is this?
               </label>
-              <p className="text-sm leading-5 text-gray-500">
+              <p className="text-sm leading-5 text-gray-500 mb-4">
                 Choose whether your petition addresses local or national issues
               </p>
-              <fieldset className="mt-4">
-                <div className="space-y-4">
-                  <div className="flex items-center">
-                    <input
-                      id="local"
-                      name="petition-type"
-                      type="radio"
-                      checked={formData.type === 'local'}
-                      onChange={() => handleInputChange('type', 'local')}
-                      className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label htmlFor="local" className="ml-3 block text-sm font-medium text-gray-700">
-                      Local Petition
-                    </label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Card
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                    formData.type === 'local'
+                      ? 'border-2 border-blue-500 bg-blue-50'
+                      : 'border border-gray-300 hover:border-gray-400'
+                  }`}
+                  onClick={() => handleInputChange('type', 'local')}
+                >
+                  <div className="p-6">
+                    <div className="flex items-center">
+                      <input
+                        id="local"
+                        name="petition-type"
+                        type="radio"
+                        checked={formData.type === 'local'}
+                        onChange={() => handleInputChange('type', 'local')}
+                        className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="local" className="ml-3 text-lg font-medium text-gray-900">
+                        Local Petition
+                      </label>
+                    </div>
+                    <p className="mt-2 text-sm text-gray-600">
+                      Address issues in your city, county, or state
+                    </p>
                   </div>
-                  <p className="ml-7 text-sm text-gray-500">
-                    Address issues in your city, county, or state
-                  </p>
+                </Card>
 
-                  <div className="flex items-center">
-                    <input
-                      id="national"
-                      name="petition-type"
-                      type="radio"
-                      checked={formData.type === 'national'}
-                      onChange={() => handleInputChange('type', 'national')}
-                      className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
-                    />
-                    <label
-                      htmlFor="national"
-                      className="ml-3 block text-sm font-medium text-gray-700"
-                    >
-                      National Petition
-                    </label>
+                <Card
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                    formData.type === 'national'
+                      ? 'border-2 border-blue-500 bg-blue-50'
+                      : 'border border-gray-300 hover:border-gray-400'
+                  }`}
+                  onClick={() => handleInputChange('type', 'national')}
+                >
+                  <div className="p-6">
+                    <div className="flex items-center">
+                      <input
+                        id="national"
+                        name="petition-type"
+                        type="radio"
+                        checked={formData.type === 'national'}
+                        onChange={() => handleInputChange('type', 'national')}
+                        className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="national" className="ml-3 text-lg font-medium text-gray-900">
+                        National Petition
+                      </label>
+                    </div>
+                    <p className="mt-2 text-sm text-gray-600">
+                      Address issues that affect the entire country
+                    </p>
                   </div>
-                  <p className="ml-7 text-sm text-gray-500">
-                    Address issues that affect the entire country
-                  </p>
-                </div>
-              </fieldset>
+                </Card>
+              </div>
             </div>
 
             {/* Location field for local petitions */}
@@ -349,43 +392,105 @@ export default function CreatePetition() {
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Petition Description *
               </label>
-              <p className="text-sm text-gray-500 mb-2">
-                Explain the issue, why it matters, and what action you want taken
+              <p className="text-sm text-gray-500 mb-4">
+                Explain the issue, why it matters, and what action you want taken. You can use markdown formatting for better presentation.
               </p>
-              <Textarea
-                id="description"
-                rows={8}
-                value={formData.description}
-                onChange={e => handleInputChange('description', e.target.value)}
-                placeholder="Describe your petition in detail. Include background information, why this issue is important, and what specific action you're requesting..."
-                className={errors.description ? 'border-red-300' : ''}
-                maxLength={2000}
-              />
-              <div className="flex justify-between items-center mt-1">
+              <div className={`rounded-md overflow-hidden ${errors.description ? 'ring-2 ring-red-500' : ''}`}>
+                <MDEditor
+                  value={formData.description}
+                  onChange={(value) => handleInputChange('description', value || '')}
+                  preview="edit"
+                  hideToolbar={false}
+                  visibleDragBar={false}
+                  textareaProps={{
+                    placeholder: 'Describe your petition in detail. Include:\n\n- Background information about the issue\n- Why this issue is important to you and others\n- What specific action you\'re requesting\n- Any supporting evidence or examples\n\nYou can use **bold**, *italic*, lists, and other markdown formatting to make your petition more engaging.',
+                    style: { minHeight: '200px' },
+                  }}
+                  height={300}
+                />
+              </div>
+              <div className="flex justify-between items-center mt-2">
                 {errors.description && <p className="text-sm text-red-600">{errors.description}</p>}
-                <p className="text-xs text-gray-500 ml-auto">{formData.description.length}/2000</p>
+                <p className="text-xs text-gray-500 ml-auto">{formData.description.length} characters</p>
+              </div>
+
+              <div className="mt-2 text-xs text-gray-500">
+                <p className="font-medium mb-1">Markdown formatting tips:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <span>**Bold text**</span>
+                  <span>*Italic text*</span>
+                  <span>- Bullet points</span>
+                  <span>1. Numbered lists</span>
+                </div>
               </div>
             </div>
 
-            {/* Image URL */}
+            {/* Image Upload */}
             <div>
-              <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">
-                Image URL (optional)
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Petition Image (optional)
               </label>
-              <p className="text-sm text-gray-500 mb-2">
-                Add an image to make your petition more compelling
+              <p className="text-sm text-gray-500 mb-4">
+                Add an image to make your petition more compelling (Max 5MB)
               </p>
-              <Input
-                type="url"
-                id="imageUrl"
-                value={formData.imageUrl}
-                onChange={e => handleInputChange('imageUrl', e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className={errors.imageUrl ? 'border-red-300' : ''}
-              />
+
+              <div className="flex flex-col space-y-4">
+                <div className="flex items-center justify-center w-full">
+                  <label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400">
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      {formData.imageUrl ? (
+                        <div className="text-center">
+                          <p className="text-sm text-green-600 font-medium">✓ Image uploaded</p>
+                          <p className="text-xs text-gray-500">{formData.imageFile?.name}</p>
+                        </div>
+                      ) : (
+                        <>
+                          <svg className="w-8 h-8 mb-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          <p className="mb-2 text-sm text-gray-500">
+                            <span className="font-semibold">Click to upload</span> or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      id="image-upload"
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                    />
+                  </label>
+                </div>
+
+                {formData.imageUrl && (
+                  <div className="relative">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Petition preview"
+                      className="w-full h-48 object-cover rounded-lg"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        handleInputChange('imageUrl', '')
+                        handleInputChange('imageFile', null)
+                      }}
+                      className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
             </div>
 
@@ -414,32 +519,65 @@ export default function CreatePetition() {
             {/* Categories */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Categories (select all that apply)
+                Categories
               </label>
-              <div className="grid grid-cols-2 gap-4">
-                {categories.map(category => (
-                  <div key={category.id} className="flex items-start">
-                    <input
-                      type="checkbox"
-                      id={`category-${category.id}`}
-                      checked={formData.categories.includes(category.id)}
-                      onChange={() => handleCategoryToggle(category.id)}
-                      className="mt-1 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                    />
-                    <div className="ml-3">
-                      <label
-                        htmlFor={`category-${category.id}`}
-                        className="text-sm font-medium text-gray-700"
-                      >
+              <p className="text-sm text-gray-500 mb-3">
+                Select categories that best describe your petition
+              </p>
+
+              {/* Category Dropdown */}
+              <div className="relative">
+                <select
+                  onChange={(e) => {
+                    const categoryId = parseInt(e.target.value)
+                    if (categoryId && !formData.categories.includes(categoryId)) {
+                      handleCategoryToggle(categoryId)
+                    }
+                    e.target.value = '' // Reset selection
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Choose a category to add...</option>
+                  {categories
+                    .filter(category => !formData.categories.includes(category.id))
+                    .map(category => (
+                      <option key={category.id} value={category.id}>
                         {category.name}
-                      </label>
-                      {category.description && (
-                        <p className="text-xs text-gray-500">{category.description}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                      </option>
+                    ))
+                  }
+                </select>
               </div>
+
+              {/* Selected Categories as Tags */}
+              {formData.categories.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Selected categories:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {formData.categories.map(categoryId => {
+                      const category = categories.find(c => c.id === categoryId)
+                      return category ? (
+                        <Badge
+                          key={categoryId}
+                          variant="secondary"
+                          className="flex items-center gap-1 px-3 py-1"
+                        >
+                          {category.name}
+                          <button
+                            type="button"
+                            onClick={() => handleCategoryToggle(categoryId)}
+                            className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
+                          >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </Badge>
+                      ) : null
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}

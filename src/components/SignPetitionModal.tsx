@@ -210,7 +210,7 @@ export default function SignPetitionModal({
               <Button
                 type="submit"
                 disabled={signing}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 text-white"
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
               >
                 {signing ? 'Signing...' : 'Sign Petition'}
               </Button>
