@@ -9,11 +9,8 @@ import type {
   PetitionWithDetails,
 } from '@/types/api'
 
-// API base URL - in development Vite will proxy API calls
-const API_BASE_URL =
-  import.meta.env.NODE_ENV === 'production'
-    ? '' // In production, API calls will be relative to the same domain
-    : '' // In development, Vite with Cloudflare plugin will handle API calls
+// API base URL - Vite Cloudflare plugin serves functions on same port
+const API_BASE_URL = '' // Always use relative URLs - Vite plugin handles routing
 
 class ApiError extends Error {
   constructor(

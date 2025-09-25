@@ -6,7 +6,17 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), cloudflare(), tailwindcss()],
+  plugins: [
+    react(), 
+    cloudflare({
+      // Configure Cloudflare plugin for local development
+      persist: {
+        path: '.wrangler/state/v3'
+      },
+      configPath: './wrangler.toml'
+    }), 
+    tailwindcss()
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

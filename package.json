@@ -17,7 +17,6 @@
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.13.5",
-    "@cloudflare/workers-types": "^4.20250924.0",
     "@icons-pack/react-simple-icons": "^13.7.0",
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/vite": "^4.1.13",
@@ -35,6 +34,7 @@
     "wrangler": "^4.40.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250924.0",
     "@eslint/js": "^9.36.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.9",
