@@ -1,21 +1,25 @@
-import { 
-  CreateUserInput, 
-  CreatePetitionInput, 
+import type {
+  CreateUserInput,
+  CreatePetitionInput,
   CreateSignatureInput,
   User,
   Petition,
   Signature,
   Category,
-  PetitionWithDetails 
-} from '../types/api'
+  PetitionWithDetails,
+} from '@/types/api'
 
 // API base URL - in development Vite will proxy API calls
-const API_BASE_URL = process.env.NODE_ENV === 'production' 
-  ? '' // In production, API calls will be relative to the same domain
-  : '' // In development, Vite with Cloudflare plugin will handle API calls
+const API_BASE_URL =
+  import.meta.env.NODE_ENV === 'production'
+    ? '' // In production, API calls will be relative to the same domain
+    : '' // In development, Vite with Cloudflare plugin will handle API calls
 
 class ApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string
+  ) {
     super(message)
     this.name = 'ApiError'
   }
@@ -23,7 +27,7 @@ class ApiError extends Error {
 
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
-  
+
   const response = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
@@ -71,13 +75,15 @@ export const petitionApi = {
     return apiRequest<PetitionWithDetails>(`/api/petitions/${id}`)
   },
 
-  async getAll(params: {
-    limit?: number
-    offset?: number
-    type?: 'local' | 'national'
-  } = {}): Promise<PetitionWithDetails[]> {
+  async getAll(
+    params: {
+      limit?: number
+      offset?: number
+      type?: 'local' | 'national'
+    } = {}
+  ): Promise<PetitionWithDetails[]> {
     const searchParams = new URLSearchParams()
-    
+
     if (params.limit) searchParams.set('limit', params.limit.toString())
     if (params.offset) searchParams.set('offset', params.offset.toString())
     if (params.type) searchParams.set('type', params.type)
@@ -85,12 +91,15 @@ export const petitionApi = {
     return apiRequest<PetitionWithDetails[]>(`/api/petitions?${searchParams}`)
   },
 
-  async getSignatures(petitionId: number, params: {
-    limit?: number
-    offset?: number
-  } = {}): Promise<Signature[]> {
+  async getSignatures(
+    petitionId: number,
+    params: {
+      limit?: number
+      offset?: number
+    } = {}
+  ): Promise<Signature[]> {
     const searchParams = new URLSearchParams()
-    
+
     if (params.limit) searchParams.set('limit', params.limit.toString())
     if (params.offset) searchParams.set('offset', params.offset.toString())
 

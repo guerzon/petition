@@ -5,7 +5,7 @@ import { Button } from './ui/button'
 import { Input } from './ui/input'
 import { Textarea } from './ui/textarea'
 import { petitionApi, categoryApi, userApi, ApiError } from '../services/api'
-import { Category } from '../types/api'
+import type { Category } from '../types/api'
 
 interface CreatePetitionFormData {
   title: string
@@ -16,7 +16,6 @@ interface CreatePetitionFormData {
   imageUrl: string
   categories: number[]
 }
-
 
 export default function CreatePetition() {
   const navigate = useNavigate()
@@ -46,14 +45,54 @@ export default function CreatePetition() {
         console.error('Failed to load categories:', error)
         // Fallback to hardcoded categories if API fails
         setCategories([
-          { id: 1, name: 'Environment', description: 'Environmental protection and sustainability', created_at: '' },
-          { id: 2, name: 'Education', description: 'Educational policies and reforms', created_at: '' },
-          { id: 3, name: 'Healthcare', description: 'Healthcare access and policies', created_at: '' },
-          { id: 4, name: 'Social Justice', description: 'Social equality and justice', created_at: '' },
-          { id: 5, name: 'Transportation', description: 'Public transportation and infrastructure', created_at: '' },
-          { id: 6, name: 'Local Government', description: 'Local government policies', created_at: '' },
-          { id: 7, name: 'Animal Rights', description: 'Animal welfare and protection', created_at: '' },
-          { id: 8, name: 'Technology', description: 'Technology policies and digital rights', created_at: '' },
+          {
+            id: 1,
+            name: 'Environment',
+            description: 'Environmental protection and sustainability',
+            created_at: '',
+          },
+          {
+            id: 2,
+            name: 'Education',
+            description: 'Educational policies and reforms',
+            created_at: '',
+          },
+          {
+            id: 3,
+            name: 'Healthcare',
+            description: 'Healthcare access and policies',
+            created_at: '',
+          },
+          {
+            id: 4,
+            name: 'Social Justice',
+            description: 'Social equality and justice',
+            created_at: '',
+          },
+          {
+            id: 5,
+            name: 'Transportation',
+            description: 'Public transportation and infrastructure',
+            created_at: '',
+          },
+          {
+            id: 6,
+            name: 'Local Government',
+            description: 'Local government policies',
+            created_at: '',
+          },
+          {
+            id: 7,
+            name: 'Animal Rights',
+            description: 'Animal welfare and protection',
+            created_at: '',
+          },
+          {
+            id: 8,
+            name: 'Technology',
+            description: 'Technology policies and digital rights',
+            created_at: '',
+          },
         ])
       } finally {
         setIsLoading(false)
@@ -107,14 +146,14 @@ export default function CreatePetition() {
     field: keyof CreatePetitionFormData,
     value: string | number | string[]
   ) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value,
     }))
 
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors((prev) => ({
+      setErrors(prev => ({
         ...prev,
         [field]: undefined,
       }))
@@ -123,7 +162,7 @@ export default function CreatePetition() {
 
   const handleCategoryToggle = (categoryId: number) => {
     const updatedCategories = formData.categories.includes(categoryId)
-      ? formData.categories.filter((id) => id !== categoryId)
+      ? formData.categories.filter(id => id !== categoryId)
       : [...formData.categories, categoryId]
 
     handleInputChange('categories', updatedCategories)
@@ -146,7 +185,7 @@ export default function CreatePetition() {
         first_name: 'Demo',
         last_name: 'User',
         email: 'demo@example.com',
-        anonymous: false
+        anonymous: false,
       }
 
       let userId = 1 // Fallback to user ID 1
@@ -171,7 +210,7 @@ export default function CreatePetition() {
       }
 
       const petition = await petitionApi.create(petitionData)
-      
+
       // Navigate to petition detail page or success page
       navigate(`/?created=${petition.id}`)
     } catch (error) {
@@ -240,7 +279,7 @@ export default function CreatePetition() {
                   <p className="ml-7 text-sm text-gray-500">
                     Address issues in your city, county, or state
                   </p>
-                  
+
                   <div className="flex items-center">
                     <input
                       id="national"
@@ -250,7 +289,10 @@ export default function CreatePetition() {
                       onChange={() => handleInputChange('type', 'national')}
                       className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
-                    <label htmlFor="national" className="ml-3 block text-sm font-medium text-gray-700">
+                    <label
+                      htmlFor="national"
+                      className="ml-3 block text-sm font-medium text-gray-700"
+                    >
                       National Petition
                     </label>
                   </div>
@@ -274,13 +316,11 @@ export default function CreatePetition() {
                   type="text"
                   id="location"
                   value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
+                  onChange={e => handleInputChange('location', e.target.value)}
                   placeholder="e.g., Springfield, MA or Riverside County, CA"
                   className={errors.location ? 'border-red-300' : ''}
                 />
-                {errors.location && (
-                  <p className="mt-1 text-sm text-red-600">{errors.location}</p>
-                )}
+                {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
               </div>
             )}
 
@@ -296,18 +336,14 @@ export default function CreatePetition() {
                 type="text"
                 id="title"
                 value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
+                onChange={e => handleInputChange('title', e.target.value)}
                 placeholder="e.g., Save Our Local Park from Development"
                 className={errors.title ? 'border-red-300' : ''}
                 maxLength={150}
               />
               <div className="flex justify-between items-center mt-1">
-                {errors.title && (
-                  <p className="text-sm text-red-600">{errors.title}</p>
-                )}
-                <p className="text-xs text-gray-500 ml-auto">
-                  {formData.title.length}/150
-                </p>
+                {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
+                <p className="text-xs text-gray-500 ml-auto">{formData.title.length}/150</p>
               </div>
             </div>
 
@@ -323,18 +359,14 @@ export default function CreatePetition() {
                 id="description"
                 rows={8}
                 value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
+                onChange={e => handleInputChange('description', e.target.value)}
                 placeholder="Describe your petition in detail. Include background information, why this issue is important, and what specific action you're requesting..."
                 className={errors.description ? 'border-red-300' : ''}
                 maxLength={2000}
               />
               <div className="flex justify-between items-center mt-1">
-                {errors.description && (
-                  <p className="text-sm text-red-600">{errors.description}</p>
-                )}
-                <p className="text-xs text-gray-500 ml-auto">
-                  {formData.description.length}/2000
-                </p>
+                {errors.description && <p className="text-sm text-red-600">{errors.description}</p>}
+                <p className="text-xs text-gray-500 ml-auto">{formData.description.length}/2000</p>
               </div>
             </div>
 
@@ -350,13 +382,11 @@ export default function CreatePetition() {
                 type="url"
                 id="imageUrl"
                 value={formData.imageUrl}
-                onChange={(e) => handleInputChange('imageUrl', e.target.value)}
+                onChange={e => handleInputChange('imageUrl', e.target.value)}
                 placeholder="https://example.com/image.jpg"
                 className={errors.imageUrl ? 'border-red-300' : ''}
               />
-              {errors.imageUrl && (
-                <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>
-              )}
+              {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
             </div>
 
             {/* Target Count */}
@@ -371,7 +401,7 @@ export default function CreatePetition() {
                 type="number"
                 id="targetCount"
                 value={formData.targetCount}
-                onChange={(e) => handleInputChange('targetCount', parseInt(e.target.value) || 0)}
+                onChange={e => handleInputChange('targetCount', parseInt(e.target.value) || 0)}
                 min="1"
                 max="1000000"
                 className={errors.targetCount ? 'border-red-300' : ''}
@@ -387,7 +417,7 @@ export default function CreatePetition() {
                 Categories (select all that apply)
               </label>
               <div className="grid grid-cols-2 gap-4">
-                {categories.map((category) => (
+                {categories.map(category => (
                   <div key={category.id} className="flex items-start">
                     <input
                       type="checkbox"
@@ -422,11 +452,7 @@ export default function CreatePetition() {
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="min-w-[120px]"
-              >
+              <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
                 {isSubmitting ? 'Creating...' : 'Create Petition'}
               </Button>
             </div>
