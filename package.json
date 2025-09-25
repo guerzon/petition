@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "db:create": "wrangler d1 create petition-db --location apac",
     "db:migrate": "wrangler d1 execute petition-db --file=./src/db/migrations/001_create_tables.sql",
+    "db:migrate:002": "wrangler d1 execute petition-db --file=./src/db/migrations/002_add_due_date_and_slug.sql",
     "db:seed": "wrangler d1 execute petition-db --file=./src/db/seeds/001_seed_data.sql"
   },
   "dependencies": {

@@ -9,8 +9,7 @@ import { petitionApi, signatureApi, userApi, ApiError } from '@/services/api'
 import type { PetitionWithDetails, Signature } from '@/types/api'
 
 export default function PetitionDetail() {
-  const { id } = useParams<{ id: string }>()
-  const petitionId = parseInt(id || '0')
+  const { slug } = useParams<{ slug: string }>()
 
   const [petition, setPetition] = useState<PetitionWithDetails | null>(null)
   const [signatures, setSignatures] = useState<Signature[]>([])
@@ -32,16 +31,23 @@ export default function PetitionDetail() {
   const [signErrors, setSignErrors] = useState<Record<string, string>>({})
 
   useEffect(() => {
-    if (petitionId) {
+    if (slug) {
       fetchPetition()
-      fetchSignatures()
     }
-  }, [petitionId])
+  }, [slug])
 
   const fetchPetition = async () => {
     try {
-      const data = await petitionApi.getById(petitionId)
+      const data = await petitionApi.getBySlug(slug!)
       setPetition(data)
+      
+      // Fetch signatures once we have the petition data
+      try {
+        const signatures = await petitionApi.getSignatures(data.id, { limit: 20 })
+        setSignatures(signatures)
+      } catch (sigErr) {
+        console.error('Failed to fetch signatures:', sigErr)
+      }
     } catch (err) {
       console.error('Failed to fetch petition:', err)
       setError('Failed to load petition. Please try again later.')
@@ -51,9 +57,10 @@ export default function PetitionDetail() {
   }
 
   const fetchSignatures = async () => {
+    if (!petition) return
     setSignaturesLoading(true)
     try {
-      const data = await petitionApi.getSignatures(petitionId, { limit: 20 })
+      const data = await petitionApi.getSignatures(petition.id, { limit: 20 })
       setSignatures(data)
     } catch (err) {
       console.error('Failed to fetch signatures:', err)
@@ -116,7 +123,7 @@ export default function PetitionDetail() {
 
       // Create signature
       await signatureApi.create({
-        petition_id: petitionId,
+        petition_id: petition!.id,
         user_id: userId,
         comment: signForm.comment.trim() || undefined,
         anonymous: signForm.anonymous,
@@ -129,7 +136,6 @@ export default function PetitionDetail() {
       
       // Refresh petition data to get updated count
       await fetchPetition()
-      await fetchSignatures()
 
       // Reset form
       setSignForm({

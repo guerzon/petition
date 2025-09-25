@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -18,11 +18,7 @@ export default function AllPetitions() {
 
   const PETITIONS_PER_PAGE = 12
 
-  useEffect(() => {
-    fetchPetitions(true) // Reset when filters change
-  }, [filter])
-
-  const fetchPetitions = async (reset = false) => {
+  const fetchPetitions = useCallback(async (reset = false) => {
     try {
       if (reset) {
         setLoading(true)
@@ -51,7 +47,11 @@ export default function AllPetitions() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [filter, page])
+
+  useEffect(() => {
+    fetchPetitions(true) // Reset when filters change
+  }, [filter, fetchPetitions])
 
   const handleLoadMore = () => {
     setPage(prev => prev + 1)
@@ -167,7 +167,7 @@ export default function AllPetitions() {
                         <span className="text-sm text-gray-500">{daysLeft} days left</span>
                       </div>
                       <CardTitle className="text-xl font-semibold line-clamp-2">
-                        <Link to={`/petition/${petition.id}`} className="hover:text-blue-600 transition-colors">
+                        <Link to={`/petition/${petition.slug}`} className="hover:text-blue-600 transition-colors">
                           {petition.title}
                         </Link>
                       </CardTitle>
@@ -193,7 +193,7 @@ export default function AllPetitions() {
                         <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
                       </div>
 
-                      <Link to={`/petition/${petition.id}`}>
+                      <Link to={`/petition/${petition.slug}`}>
                         <Button className="w-full">View & Sign Petition</Button>
                       </Link>
                     </CardContent>

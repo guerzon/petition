@@ -28,7 +28,7 @@ function App() {
             <Route path="/create" element={<CreatePetition />} />
             <Route path="/petitions" element={<AllPetitions />} />
             <Route path="/featured" element={<FeaturedPetitions />} />
-            <Route path="/petition/:id" element={<PetitionDetail />} />
+            <Route path="/petition/:slug" element={<PetitionDetail />} />
           </Routes>
         </main>
         <Footer />

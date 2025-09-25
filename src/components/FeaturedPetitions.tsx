@@ -131,7 +131,7 @@ export default function FeaturedPetitions() {
                       </span>
                     </div>
                     <CardTitle className="text-2xl font-bold mb-2">
-                      <Link to={`/petition/${petitions[0].id}`} className="hover:text-blue-600 transition-colors">
+                      <Link to={`/petition/${petitions[0].slug}`} className="hover:text-blue-600 transition-colors">
                         {petitions[0].title}
                       </Link>
                     </CardTitle>
@@ -160,7 +160,7 @@ export default function FeaturedPetitions() {
                       </div>
                     </div>
 
-                    <Link to={`/petition/${petitions[0].id}`}>
+                    <Link to={`/petition/${petitions[0].slug}`}>
                       <Button size="lg" className="w-full sm:w-auto">
                         View & Sign Featured Petition
                       </Button>
@@ -191,7 +191,7 @@ export default function FeaturedPetitions() {
                         <span className="text-sm text-gray-500">{daysLeft} days left</span>
                       </div>
                       <CardTitle className="text-xl font-semibold line-clamp-2">
-                        <Link to={`/petition/${petition.id}`} className="hover:text-blue-600 transition-colors">
+                        <Link to={`/petition/${petition.slug}`} className="hover:text-blue-600 transition-colors">
                           {petition.title}
                         </Link>
                       </CardTitle>
@@ -217,7 +217,7 @@ export default function FeaturedPetitions() {
                         <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
                       </div>
 
-                      <Link to={`/petition/${petition.id}`}>
+                      <Link to={`/petition/${petition.slug}`}>
                         <Button className="w-full">View & Sign Petition</Button>
                       </Link>
                     </CardContent>

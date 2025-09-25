@@ -107,7 +107,7 @@ export default function PetitionsList() {
                     <span className="text-sm text-gray-500">{daysLeft} days left</span>
                   </div>
                   <CardTitle className="text-xl font-semibold line-clamp-2 font-[Figtree]">
-                    <Link to={`/petition/${petition.id}`} className="hover:text-blue-600 transition-colors">
+                    <Link to={`/petition/${petition.slug}`} className="hover:text-blue-600 transition-colors">
                       {petition.title}
                     </Link>
                   </CardTitle>
@@ -133,7 +133,7 @@ export default function PetitionsList() {
                     <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
                   </div>
 
-                  <Link to={`/petition/${petition.id}`}>
+                  <Link to={`/petition/${petition.slug}`}>
                     <Button className="w-full text-white">View & Sign Petition</Button>
                   </Link>
                 </CardContent>

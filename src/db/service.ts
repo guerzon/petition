@@ -50,11 +50,36 @@ export class DatabaseService {
     return await stmt.bind(email).first<User>()
   }
 
+  // Helper method to generate URL-friendly slug
+  private generateSlug(title: string, id?: number): string {
+    const baseSlug = title
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+      .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+      .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+      
+    return id ? `${baseSlug}-${id}` : baseSlug
+  }
+
+  // Helper method to get due date (60 days from now if not provided)
+  private getDueDate(providedDate?: string): string {
+    if (providedDate) {
+      return providedDate
+    }
+    
+    const dueDate = new Date()
+    dueDate.setDate(dueDate.getDate() + 60)
+    return dueDate.toISOString()
+  }
+
   // Petition methods
   async createPetition(petitionData: CreatePetitionInput): Promise<Petition> {
+    const dueDate = this.getDueDate(petitionData.due_date)
+    
     const stmt = this.db.prepare(`
-      INSERT INTO petitions (title, description, type, image_url, target_count, location, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO petitions (title, description, type, image_url, target_count, location, due_date, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *
     `)
 
@@ -66,6 +91,7 @@ export class DatabaseService {
         petitionData.image_url || null,
         petitionData.target_count || 1000,
         petitionData.location || null,
+        dueDate,
         petitionData.created_by
       )
       .first<Petition>()
@@ -74,6 +100,11 @@ export class DatabaseService {
       throw new Error('Failed to create petition')
     }
 
+    // Generate and update slug
+    const slug = this.generateSlug(petitionData.title, result.id)
+    const updateSlugStmt = this.db.prepare('UPDATE petitions SET slug = ? WHERE id = ?')
+    await updateSlugStmt.bind(slug, result.id).run()
+
     // Add categories if provided
     if (petitionData.category_ids && petitionData.category_ids.length > 0) {
       for (const categoryId of petitionData.category_ids) {
@@ -81,7 +112,47 @@ export class DatabaseService {
       }
     }
 
-    return result
+    // Return updated petition with slug
+    return { ...result, slug }
+  }
+
+  async getPetitionBySlug(slug: string): Promise<PetitionWithDetails | null> {
+    const stmt = this.db.prepare(`
+      SELECT 
+        p.*,
+        u.first_name as creator_first_name,
+        u.last_name as creator_last_name,
+        u.anonymous as creator_anonymous,
+        COUNT(s.id) as signature_count
+      FROM petitions p
+      JOIN users u ON p.created_by = u.id
+      LEFT JOIN signatures s ON p.id = s.petition_id
+      WHERE p.slug = ?
+      GROUP BY p.id
+    `)
+    
+    const petition = await stmt.bind(slug).first<any>()
+    if (!petition) return null
+
+    // Get categories
+    const categoriesStmt = this.db.prepare(`
+      SELECT c.*
+      FROM categories c
+      JOIN petition_categories pc ON c.id = pc.category_id
+      WHERE pc.petition_id = ?
+    `)
+    const categoriesResult = await categoriesStmt.bind(petition.id).all<Category>()
+    
+    return {
+      ...petition,
+      creator: {
+        first_name: petition.creator_first_name,
+        last_name: petition.creator_last_name,
+        anonymous: petition.creator_anonymous
+      },
+      categories: categoriesResult.results || [],
+      signature_count: petition.signature_count || 0
+    }
   }
 
   async getPetitionById(id: number): Promise<PetitionWithDetails | null> {

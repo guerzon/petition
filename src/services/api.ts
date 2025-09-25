@@ -72,6 +72,10 @@ export const petitionApi = {
     return apiRequest<PetitionWithDetails>(`/api/petitions/${id}`)
   },
 
+  async getBySlug(slug: string): Promise<PetitionWithDetails> {
+    return apiRequest<PetitionWithDetails>(`/api/petitions/slug/${slug}`)
+  },
+
   async getAll(
     params: {
       limit?: number

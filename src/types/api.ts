@@ -19,6 +19,8 @@ export interface Petition {
   current_count: number
   status: 'active' | 'completed' | 'closed'
   location?: string
+  slug: string
+  due_date: string
   created_by: number
   created_at: string
   updated_at: string
@@ -62,6 +64,7 @@ export interface CreatePetitionInput {
   image_url?: string
   target_count?: number
   location?: string
+  due_date?: string // Optional, will default to 60 days from now
   created_by: number
   category_ids?: number[]
 }
