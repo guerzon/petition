@@ -1,135 +1,106 @@
-// Main Cloudflare Worker entry point
-import { DatabaseService } from '../src/db/service'
-import { CreateUserInput, CreatePetitionInput, CreateSignatureInput } from '../src/db/schemas/types'
+// Main Cloudflare Worker entry point - routes to individual functions
+import { Env, EventContext } from './_shared/types'
 
-export interface Env {
-  DB: D1Database
+// Import individual function handlers
+import { onRequest as testHandler } from './api/test'
+import { onRequest as usersHandler } from './api/users'
+import { onRequest as userByIdHandler } from './api/users/[id]'
+import { onRequest as petitionsHandler } from './api/petitions'
+import { onRequest as petitionByIdHandler } from './api/petitions/[id]'
+import { onRequest as petitionSignaturesHandler } from './api/petitions/[id]/signatures'
+import { onRequest as signaturesHandler } from './api/signatures'
+import { onRequest as categoriesHandler } from './api/categories'
+
+function createContext(request: Request, env: Env, params: Record<string, string> = {}): EventContext<Env> {
+  return {
+    request,
+    env,
+    params,
+    waitUntil: () => {}, // Simplified for now
+    next: async () => new Response('Not implemented', { status: 501 }),
+    data: {},
+  }
+}
+
+function parsePathParams(path: string, pattern: string): Record<string, string> {
+  const pathParts = path.split('/').filter(p => p)
+  const patternParts = pattern.split('/').filter(p => p)
+  const params: Record<string, string> = {}
+  
+  for (let i = 0; i < patternParts.length; i++) {
+    const part = patternParts[i]
+    if (part.startsWith('[') && part.endsWith(']')) {
+      const paramName = part.slice(1, -1)
+      params[paramName] = pathParts[i] || ''
+    }
+  }
+  
+  return params
 }
 
 export default {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
     const path = url.pathname
-    const method = request.method
-
-    const db = new DatabaseService(env.DB)
-
-    // Enable CORS
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    }
-
-    if (method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders })
-    }
 
     try {
-      // Test endpoint
+      // Route to appropriate function handler
       if (path === '/api/test') {
-        return new Response(JSON.stringify({ message: 'Worker is running!' }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
+        return await testHandler(createContext(request, env))
+      }
+      
+      if (path === '/api/users') {
+        return await usersHandler(createContext(request, env))
+      }
+      
+      if (path.match(/^\/api\/users\/\d+$/)) {
+        const params = parsePathParams(path, '/api/users/[id]')
+        return await userByIdHandler(createContext(request, env, params))
+      }
+      
+      if (path === '/api/petitions') {
+        return await petitionsHandler(createContext(request, env))
+      }
+      
+      if (path.match(/^\/api\/petitions\/\d+\/signatures$/)) {
+        const params = parsePathParams(path, '/api/petitions/[id]/signatures')
+        return await petitionSignaturesHandler(createContext(request, env, params))
+      }
+      
+      if (path.match(/^\/api\/petitions\/\d+$/)) {
+        const params = parsePathParams(path, '/api/petitions/[id]')
+        return await petitionByIdHandler(createContext(request, env, params))
+      }
+      
+      if (path === '/api/signatures') {
+        return await signaturesHandler(createContext(request, env))
+      }
+      
+      if (path === '/api/categories') {
+        return await categoriesHandler(createContext(request, env))
       }
 
-      // Users endpoints
-      if (path === '/api/users' && method === 'POST') {
-        const userData: CreateUserInput = await request.json()
-        const user = await db.createUser(userData)
-        return new Response(JSON.stringify(user), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      if (path.startsWith('/api/users/') && method === 'GET') {
-        const userId = parseInt(path.split('/')[3])
-        const user = await db.getUserById(userId)
-        if (!user) {
-          return new Response('User not found', { status: 404, headers: corsHeaders })
+      // 404 for unmatched routes
+      return new Response('Not Found', { 
+        status: 404,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
         }
-        return new Response(JSON.stringify(user), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      // Petitions endpoints
-      if (path === '/api/petitions' && method === 'POST') {
-        const petitionData: CreatePetitionInput = await request.json()
-        const petition = await db.createPetition(petitionData)
-        return new Response(JSON.stringify(petition), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      if (path === '/api/petitions' && method === 'GET') {
-        const type = url.searchParams.get('type') as 'local' | 'national' | undefined
-        const limit = parseInt(url.searchParams.get('limit') || '50')
-        const offset = parseInt(url.searchParams.get('offset') || '0')
-
-        const petitions = await db.getAllPetitions(limit, offset, type)
-        return new Response(JSON.stringify(petitions), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      if (path.startsWith('/api/petitions/') && method === 'GET') {
-        const pathParts = path.split('/')
-        const petitionId = parseInt(pathParts[3])
-        
-        // Handle /api/petitions/:id/signatures
-        if (pathParts[4] === 'signatures') {
-          const limit = parseInt(url.searchParams.get('limit') || '50')
-          const offset = parseInt(url.searchParams.get('offset') || '0')
-          const signatures = await db.getPetitionSignatures(petitionId, limit, offset)
-          return new Response(JSON.stringify(signatures), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          })
-        }
-        
-        // Handle /api/petitions/:id
-        const petition = await db.getPetitionById(petitionId)
-        if (!petition) {
-          return new Response('Petition not found', { status: 404, headers: corsHeaders })
-        }
-        return new Response(JSON.stringify(petition), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      // Signatures endpoints
-      if (path === '/api/signatures' && method === 'POST') {
-        const signatureData: CreateSignatureInput = await request.json()
-        const signature = await db.createSignature(signatureData)
-        return new Response(JSON.stringify(signature), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      // Categories endpoints
-      if (path === '/api/categories' && method === 'GET') {
-        const categories = await db.getAllCategories()
-        return new Response(JSON.stringify(categories), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      if (path === '/api/categories' && method === 'POST') {
-        const { name, description } = await request.json()
-        const category = await db.createCategory(name, description)
-        return new Response(JSON.stringify(category), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-
-      return new Response('Not Found', { status: 404, headers: corsHeaders })
+      })
 
     } catch (error: unknown) {
-      console.error('API Error:', error)
+      console.error('Router Error:', error)
       const message = error instanceof Error ? error.message : 'Unknown error'
       return new Response(JSON.stringify({ error: message }), {
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
       })
     }
   },
