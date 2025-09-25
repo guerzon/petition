@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
-import { petitionApi, signatureApi, userApi, ApiError } from '@/services/api'
+import { petitionApi } from '@/services/api'
 import type { PetitionWithDetails, Signature } from '@/types/api'
+import SignPetitionModal from './SignPetitionModal'
 
 export default function PetitionDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -15,19 +13,8 @@ export default function PetitionDetail() {
   const [signatures, setSignatures] = useState<Signature[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
-  const [signing, setSigning] = useState(false)
   const [signed, setSigned] = useState(false)
   const [showSignForm, setShowSignForm] = useState(false)
-
-  // Sign form state
-  const [signForm, setSignForm] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    comment: '',
-    anonymous: false,
-  })
-  const [signErrors, setSignErrors] = useState<Record<string, string>>({})
 
   const fetchPetition = useCallback(async () => {
     try {
@@ -63,85 +50,9 @@ export default function PetitionDetail() {
     return Math.max(0, 60 - daysSinceCreated)
   }
 
-  const validateSignForm = (): boolean => {
-    const errors: Record<string, string> = {}
-
-    if (!signForm.firstName.trim()) {
-      errors.firstName = 'First name is required'
-    }
-    if (!signForm.lastName.trim()) {
-      errors.lastName = 'Last name is required'
-    }
-    if (!signForm.email.trim()) {
-      errors.email = 'Email is required'
-    } else if (!/\S+@\S+\.\S+/.test(signForm.email)) {
-      errors.email = 'Please enter a valid email'
-    }
-
-    setSignErrors(errors)
-    return Object.keys(errors).length === 0
-  }
-
-  const handleSign = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!validateSignForm()) {
-      return
-    }
-
-    setSigning(true)
-
-    try {
-      // Create or find user
-      let userId: number
-      try {
-        const user = await userApi.create({
-          first_name: signForm.firstName,
-          last_name: signForm.lastName,
-          email: signForm.email,
-          anonymous: signForm.anonymous,
-        })
-        userId = user.id
-      } catch (error) {
-        // User might already exist, use fallback ID for demo
-        console.warn('User creation failed, using demo approach:', error)
-        userId = 1
-      }
-
-      // Create signature
-      await signatureApi.create({
-        petition_id: petition!.id,
-        user_id: userId,
-        comment: signForm.comment.trim() || undefined,
-        anonymous: signForm.anonymous,
-        ip_address: undefined, // Would be set server-side in real app
-      })
-
-      // Update local state
-      setSigned(true)
-      setShowSignForm(false)
-
-      // Refresh petition data to get updated count
-      await fetchPetition()
-
-      // Reset form
-      setSignForm({
-        firstName: '',
-        lastName: '',
-        email: '',
-        comment: '',
-        anonymous: false,
-      })
-    } catch (err) {
-      console.error('Error signing petition:', err)
-      if (err instanceof ApiError && err.status === 409) {
-        setSignErrors({ general: 'You have already signed this petition.' })
-      } else {
-        setSignErrors({ general: 'Failed to sign petition. Please try again.' })
-      }
-    } finally {
-      setSigning(false)
-    }
+  const handleSignSuccess = async () => {
+    setSigned(true)
+    await fetchPetition()
   }
 
   if (loading) {
@@ -361,103 +272,12 @@ export default function PetitionDetail() {
           </div>
         </div>
 
-        {/* Sign Form Modal */}
-        {showSignForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
-              <CardHeader>
-                <CardTitle>Sign This Petition</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSign} className="space-y-4">
-                  {signErrors.general && (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-                      {signErrors.general}
-                    </div>
-                  )}
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-1">First Name *</label>
-                      <Input
-                        value={signForm.firstName}
-                        onChange={e => setSignForm({ ...signForm, firstName: e.target.value })}
-                        className={signErrors.firstName ? 'border-red-300' : ''}
-                      />
-                      {signErrors.firstName && (
-                        <p className="text-red-600 text-xs mt-1">{signErrors.firstName}</p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-1">Last Name *</label>
-                      <Input
-                        value={signForm.lastName}
-                        onChange={e => setSignForm({ ...signForm, lastName: e.target.value })}
-                        className={signErrors.lastName ? 'border-red-300' : ''}
-                      />
-                      {signErrors.lastName && (
-                        <p className="text-red-600 text-xs mt-1">{signErrors.lastName}</p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Email *</label>
-                    <Input
-                      type="email"
-                      value={signForm.email}
-                      onChange={e => setSignForm({ ...signForm, email: e.target.value })}
-                      className={signErrors.email ? 'border-red-300' : ''}
-                    />
-                    {signErrors.email && (
-                      <p className="text-red-600 text-xs mt-1">{signErrors.email}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Comment (optional)</label>
-                    <Textarea
-                      rows={3}
-                      value={signForm.comment}
-                      onChange={e => setSignForm({ ...signForm, comment: e.target.value })}
-                      placeholder="Why are you signing this petition?"
-                      maxLength={500}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">{signForm.comment.length}/500</p>
-                  </div>
-
-                  <div className="flex items-start space-x-2">
-                    <input
-                      type="checkbox"
-                      id="anonymous"
-                      checked={signForm.anonymous}
-                      onChange={e => setSignForm({ ...signForm, anonymous: e.target.checked })}
-                      className="mt-1"
-                    />
-                    <label htmlFor="anonymous" className="text-sm text-gray-700">
-                      Sign anonymously (your name won't be displayed publicly)
-                    </label>
-                  </div>
-
-                  <div className="flex gap-2 pt-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowSignForm(false)}
-                      disabled={signing}
-                      className="flex-1"
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit" disabled={signing} className="flex-1">
-                      {signing ? 'Signing...' : 'Sign Petition'}
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        <SignPetitionModal
+          petition={petition}
+          isOpen={showSignForm}
+          onClose={() => setShowSignForm(false)}
+          onSuccess={handleSignSuccess}
+        />
       </div>
     </div>
   )
