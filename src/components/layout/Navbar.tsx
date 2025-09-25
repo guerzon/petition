@@ -133,8 +133,8 @@ const Navbar: React.FC = () => {
                   to={item.href}
                   className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
                 >
-                  {t(`navbar.${item.label.toLowerCase()}`)}
-                  {item.children && item.children.length > 0 && (
+                  {t(item.label)}
+                  {item.children && (
                     <ChevronDown className="ml-1 h-4 w-4 text-gray-800 group-hover:text-primary-600 transition-colors" />
                   )}
                 </Link>
