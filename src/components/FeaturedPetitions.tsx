@@ -131,7 +131,9 @@ export default function FeaturedPetitions() {
                       </span>
                     </div>
                     <CardTitle className="text-2xl font-bold mb-2">
-                      {petitions[0].title}
+                      <Link to={`/petition/${petitions[0].id}`} className="hover:text-blue-600 transition-colors">
+                        {petitions[0].title}
+                      </Link>
                     </CardTitle>
                     <p className="text-gray-700">{petitions[0].description}</p>
                   </CardHeader>
@@ -158,9 +160,11 @@ export default function FeaturedPetitions() {
                       </div>
                     </div>
 
-                    <Button size="lg" className="w-full sm:w-auto">
-                      Sign This Featured Petition
-                    </Button>
+                    <Link to={`/petition/${petitions[0].id}`}>
+                      <Button size="lg" className="w-full sm:w-auto">
+                        View & Sign Featured Petition
+                      </Button>
+                    </Link>
                   </CardContent>
                 </Card>
               </div>
@@ -187,7 +191,9 @@ export default function FeaturedPetitions() {
                         <span className="text-sm text-gray-500">{daysLeft} days left</span>
                       </div>
                       <CardTitle className="text-xl font-semibold line-clamp-2">
-                        {petition.title}
+                        <Link to={`/petition/${petition.id}`} className="hover:text-blue-600 transition-colors">
+                          {petition.title}
+                        </Link>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -211,7 +217,9 @@ export default function FeaturedPetitions() {
                         <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
                       </div>
 
-                      <Button className="w-full">Sign This Petition</Button>
+                      <Link to={`/petition/${petition.id}`}>
+                        <Button className="w-full">View & Sign Petition</Button>
+                      </Link>
                     </CardContent>
                   </Card>
                 )

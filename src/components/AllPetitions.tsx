@@ -167,7 +167,9 @@ export default function AllPetitions() {
                         <span className="text-sm text-gray-500">{daysLeft} days left</span>
                       </div>
                       <CardTitle className="text-xl font-semibold line-clamp-2">
-                        {petition.title}
+                        <Link to={`/petition/${petition.id}`} className="hover:text-blue-600 transition-colors">
+                          {petition.title}
+                        </Link>
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -191,7 +193,9 @@ export default function AllPetitions() {
                         <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
                       </div>
 
-                      <Button className="w-full">Sign This Petition</Button>
+                      <Link to={`/petition/${petition.id}`}>
+                        <Button className="w-full">View & Sign Petition</Button>
+                      </Link>
                     </CardContent>
                   </Card>
                 )

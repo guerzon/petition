@@ -4,6 +4,7 @@ import PetitionsList from './components/PetitionsList'
 import CreatePetition from './components/CreatePetition'
 import AllPetitions from './components/AllPetitions'
 import FeaturedPetitions from './components/FeaturedPetitions'
+import PetitionDetail from './components/PetitionDetail'
 import Footer from './components/layout/Footer'
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -27,6 +28,7 @@ function App() {
             <Route path="/create" element={<CreatePetition />} />
             <Route path="/petitions" element={<AllPetitions />} />
             <Route path="/featured" element={<FeaturedPetitions />} />
+            <Route path="/petition/:id" element={<PetitionDetail />} />
           </Routes>
         </main>
         <Footer />
