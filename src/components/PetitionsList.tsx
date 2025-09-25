@@ -6,7 +6,8 @@ const mockPetitions = [
   {
     id: 1,
     title: 'Increase Funding for Public Education',
-    description: 'We demand increased funding for public schools to ensure quality education for all children.',
+    description:
+      'We demand increased funding for public schools to ensure quality education for all children.',
     signatures: 15420,
     target: 25000,
     category: 'Education',
@@ -15,7 +16,8 @@ const mockPetitions = [
   {
     id: 2,
     title: 'Improve Public Transportation Infrastructure',
-    description: 'Expand and modernize public transportation to reduce traffic congestion and carbon emissions.',
+    description:
+      'Expand and modernize public transportation to reduce traffic congestion and carbon emissions.',
     signatures: 8950,
     target: 15000,
     category: 'Transportation',
@@ -24,7 +26,8 @@ const mockPetitions = [
   {
     id: 3,
     title: 'Protect Local Wildlife Habitats',
-    description: 'Preserve critical wildlife habitats from urban development and ensure biodiversity protection.',
+    description:
+      'Preserve critical wildlife habitats from urban development and ensure biodiversity protection.',
     signatures: 22100,
     target: 30000,
     category: 'Environment',
@@ -37,14 +40,16 @@ export default function PetitionsList() {
     <section className="py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4 font-[Figtree]">Featured Petitions</h2>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4 font-[Figtree]">
+            Featured Petitions
+          </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Discover petitions that are making a real difference in communities nationwide
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {mockPetitions.map((petition) => {
+          {mockPetitions.map(petition => {
             const progressPercentage = Math.round((petition.signatures / petition.target) * 100)
 
             return (
@@ -59,9 +64,7 @@ export default function PetitionsList() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {petition.description}
-                  </p>
+                  <p className="text-gray-800 mb-4 line-clamp-3">{petition.description}</p>
 
                   <div className="mb-4">
                     <div className="flex justify-between text-sm text-gray-600 mb-1">
@@ -70,16 +73,14 @@ export default function PetitionsList() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
                         style={{ width: `${Math.min(progressPercentage, 100)}%` }}
                       />
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      {progressPercentage}% complete
-                    </div>
+                    <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
                   </div>
 
-                  <Button className="w-full">Sign This Petition</Button>
+                  <Button className="w-full text-white">Sign This Petition</Button>
                 </CardContent>
               </Card>
             )

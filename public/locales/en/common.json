@@ -2,6 +2,15 @@
   "hero": {
     "title": "Welcome to BetterGov.ph",
     "subtitle": "The volunteer run portal of the Republic of the Philippines. Find information, access government services, stay updated with the latest news about the Philippines.",
-    
+  },
+  "navbar": {
+    "browse petitions": "Browse Petitions",
+    "start a petition": "Start a Petition",
+    "how it works": "How it Works",
+    "about": "About",
+    "join us": "Join Us",
+    "hotlines": "Hotlines",
+    "search": "Search",
+    "sitemap": "Sitemap"
   }
 }
