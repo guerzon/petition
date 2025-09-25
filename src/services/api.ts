@@ -73,7 +73,7 @@ export const petitionApi = {
   },
 
   async getBySlug(slug: string): Promise<PetitionWithDetails> {
-    return apiRequest<PetitionWithDetails>(`/api/petitions/slug/${slug}`)
+    return apiRequest<PetitionWithDetails>(`/api/petition/${slug}`)
   },
 
   async getAll(

@@ -1,5 +1,5 @@
-import { Env, EventContext } from '../../../_shared/types'
-import { handleCORS, createErrorResponse, createSuccessResponse, createNotFoundResponse, getDbService } from '../../../_shared/utils'
+import { Env, EventContext } from '../../_shared/types'
+import { handleCORS, createErrorResponse, createSuccessResponse, createNotFoundResponse, getDbService } from '../../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
   const corsResponse = handleCORS(context.request)

@@ -80,5 +80,4 @@ export interface CreateSignatureInput {
 export interface PetitionWithDetails extends Petition {
   creator: Pick<User, 'first_name' | 'last_name' | 'anonymous'>
   categories: Category[]
-  signature_count: number
 }

@@ -3,7 +3,7 @@
 
 /// <reference types="@cloudflare/workers-types" />
 
-import {
+import type {
   User,
   Petition,
   Signature,
@@ -58,7 +58,7 @@ export class DatabaseService {
       .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
       .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
       .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
-      
+
     return id ? `${baseSlug}-${id}` : baseSlug
   }
 
@@ -67,7 +67,7 @@ export class DatabaseService {
     if (providedDate) {
       return providedDate
     }
-    
+
     const dueDate = new Date()
     dueDate.setDate(dueDate.getDate() + 60)
     return dueDate.toISOString()
@@ -76,7 +76,7 @@ export class DatabaseService {
   // Petition methods
   async createPetition(petitionData: CreatePetitionInput): Promise<Petition> {
     const dueDate = this.getDueDate(petitionData.due_date)
-    
+
     const stmt = this.db.prepare(`
       INSERT INTO petitions (title, description, type, image_url, target_count, location, due_date, created_by)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -117,21 +117,26 @@ export class DatabaseService {
   }
 
   async getPetitionBySlug(slug: string): Promise<PetitionWithDetails | null> {
+    // Get petition with creator info - no expensive JOIN with signatures
     const stmt = this.db.prepare(`
       SELECT 
         p.*,
         u.first_name as creator_first_name,
         u.last_name as creator_last_name,
-        u.anonymous as creator_anonymous,
-        COUNT(s.id) as signature_count
+        u.anonymous as creator_anonymous
       FROM petitions p
       JOIN users u ON p.created_by = u.id
-      LEFT JOIN signatures s ON p.id = s.petition_id
       WHERE p.slug = ?
-      GROUP BY p.id
     `)
-    
-    const petition = await stmt.bind(slug).first<any>()
+
+    const petition = await stmt.bind(slug).first<
+      Petition & {
+        creator_first_name: string
+        creator_last_name: string
+        creator_anonymous: boolean
+      }
+    >()
+
     if (!petition) return null
 
     // Get categories
@@ -142,35 +147,39 @@ export class DatabaseService {
       WHERE pc.petition_id = ?
     `)
     const categoriesResult = await categoriesStmt.bind(petition.id).all<Category>()
-    
+
+    // Use the cached current_count from the petitions table
     return {
       ...petition,
       creator: {
         first_name: petition.creator_first_name,
         last_name: petition.creator_last_name,
-        anonymous: petition.creator_anonymous
+        anonymous: petition.creator_anonymous,
       },
       categories: categoriesResult.results || [],
-      signature_count: petition.signature_count || 0
     }
   }
 
   async getPetitionById(id: number): Promise<PetitionWithDetails | null> {
+    // Get petition with creator info - no expensive JOIN with signatures
     const stmt = this.db.prepare(`
       SELECT 
         p.*,
         u.first_name as creator_first_name,
         u.last_name as creator_last_name,
-        u.anonymous as creator_anonymous,
-        COUNT(s.id) as signature_count
+        u.anonymous as creator_anonymous
       FROM petitions p
       JOIN users u ON p.created_by = u.id
-      LEFT JOIN signatures s ON p.id = s.petition_id
       WHERE p.id = ?
-      GROUP BY p.id
     `)
 
-    const petition = await stmt.bind(id).first<any>()
+    const petition = await stmt.bind(id).first<
+      Petition & {
+        creator_first_name: string
+        creator_last_name: string
+        creator_anonymous: boolean
+      }
+    >()
     if (!petition) return null
 
     // Get categories
@@ -182,6 +191,7 @@ export class DatabaseService {
     `)
     const categoriesResult = await categoriesStmt.bind(id).all<Category>()
 
+    // Use the cached current_count from the petitions table
     return {
       ...petition,
       creator: {
@@ -190,7 +200,6 @@ export class DatabaseService {
         anonymous: petition.creator_anonymous,
       },
       categories: categoriesResult.results || [],
-      signature_count: petition.signature_count || 0,
     }
   }
 
@@ -199,29 +208,34 @@ export class DatabaseService {
     offset = 0,
     type?: 'local' | 'national'
   ): Promise<PetitionWithDetails[]> {
+    // Get petitions with creator info - no expensive JOIN with signatures
     let query = `
       SELECT 
         p.*,
         u.first_name as creator_first_name,
         u.last_name as creator_last_name,
-        u.anonymous as creator_anonymous,
-        COUNT(s.id) as signature_count
+        u.anonymous as creator_anonymous
       FROM petitions p
       JOIN users u ON p.created_by = u.id
-      LEFT JOIN signatures s ON p.id = s.petition_id
     `
 
-    const params: any[] = []
+    const params: (string | number)[] = []
     if (type) {
       query += ' WHERE p.type = ?'
       params.push(type)
     }
 
-    query += ' GROUP BY p.id ORDER BY p.created_at DESC LIMIT ? OFFSET ?'
+    query += ' ORDER BY p.created_at DESC LIMIT ? OFFSET ?'
     params.push(limit, offset)
 
     const stmt = this.db.prepare(query)
-    const result = await stmt.bind(...params).all<any>()
+    const result = await stmt.bind(...params).all<
+      Petition & {
+        creator_first_name: string
+        creator_last_name: string
+        creator_anonymous: boolean
+      }
+    >()
 
     if (!result.results) return []
 
@@ -244,7 +258,6 @@ export class DatabaseService {
           anonymous: petition.creator_anonymous,
         },
         categories: categoriesResult.results || [],
-        signature_count: petition.signature_count || 0,
       })
     }
 
@@ -273,6 +286,14 @@ export class DatabaseService {
       throw new Error('Failed to create signature')
     }
 
+    // Update the cached current_count in the petitions table
+    const updateCountStmt = this.db.prepare(`
+      UPDATE petitions 
+      SET current_count = current_count + 1 
+      WHERE id = ?
+    `)
+    await updateCountStmt.bind(signatureData.petition_id).run()
+
     return result
   }
 
@@ -287,7 +308,7 @@ export class DatabaseService {
   async getPetitionSignatures(petitionId: number, limit = 50, offset = 0): Promise<Signature[]> {
     const stmt = this.db.prepare(`
       SELECT * FROM signatures 
-      WHERE petition_id = ? 
+      WHERE petition_id = ? AND comment IS NOT NULL AND comment != ''
       ORDER BY created_at DESC 
       LIMIT ? OFFSET ?
     `)

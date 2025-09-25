@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -14,7 +14,6 @@ export default function PetitionDetail() {
   const [petition, setPetition] = useState<PetitionWithDetails | null>(null)
   const [signatures, setSignatures] = useState<Signature[]>([])
   const [loading, setLoading] = useState(true)
-  const [signaturesLoading, setSignaturesLoading] = useState(false)
   const [error, setError] = useState<string>('')
   const [signing, setSigning] = useState(false)
   const [signed, setSigned] = useState(false)
@@ -30,17 +29,11 @@ export default function PetitionDetail() {
   })
   const [signErrors, setSignErrors] = useState<Record<string, string>>({})
 
-  useEffect(() => {
-    if (slug) {
-      fetchPetition()
-    }
-  }, [slug])
-
-  const fetchPetition = async () => {
+  const fetchPetition = useCallback(async () => {
     try {
       const data = await petitionApi.getBySlug(slug!)
       setPetition(data)
-      
+
       // Fetch signatures once we have the petition data
       try {
         const signatures = await petitionApi.getSignatures(data.id, { limit: 20 })
@@ -54,20 +47,14 @@ export default function PetitionDetail() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [slug])
 
-  const fetchSignatures = async () => {
-    if (!petition) return
-    setSignaturesLoading(true)
-    try {
-      const data = await petitionApi.getSignatures(petition.id, { limit: 20 })
-      setSignatures(data)
-    } catch (err) {
-      console.error('Failed to fetch signatures:', err)
-    } finally {
-      setSignaturesLoading(false)
+  useEffect(() => {
+    if (slug) {
+      fetchPetition()
     }
-  }
+  }, [slug, fetchPetition])
+
 
   const calculateDaysLeft = (createdAt: string): number => {
     const created = new Date(createdAt)
@@ -133,7 +120,7 @@ export default function PetitionDetail() {
       // Update local state
       setSigned(true)
       setShowSignForm(false)
-      
+
       // Refresh petition data to get updated count
       await fetchPetition()
 
@@ -145,7 +132,6 @@ export default function PetitionDetail() {
         comment: '',
         anonymous: false,
       })
-
     } catch (err) {
       console.error('Error signing petition:', err)
       if (err instanceof ApiError && err.status === 409) {
@@ -201,9 +187,13 @@ export default function PetitionDetail() {
         {/* Breadcrumb */}
         <nav className="mb-6">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link to="/" className="hover:text-blue-600">Home</Link>
+            <Link to="/" className="hover:text-blue-600">
+              Home
+            </Link>
             <span>→</span>
-            <Link to="/petitions" className="hover:text-blue-600">Petitions</Link>
+            <Link to="/petitions" className="hover:text-blue-600">
+              Petitions
+            </Link>
             <span>→</span>
             <span className="text-gray-900">{petition.title}</span>
           </div>
@@ -216,7 +206,7 @@ export default function PetitionDetail() {
               {/* Header */}
               <div className="mb-6">
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {petition.categories.map((category) => (
+                  {petition.categories.map(category => (
                     <Badge key={category.id} variant="secondary">
                       {category.name}
                     </Badge>
@@ -236,7 +226,12 @@ export default function PetitionDetail() {
                 )}
 
                 <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <span>Started by {petition.creator.anonymous ? 'Anonymous' : `${petition.creator.first_name} ${petition.creator.last_name}`}</span>
+                  <span>
+                    Started by{' '}
+                    {petition.creator.anonymous
+                      ? 'Anonymous'
+                      : `${petition.creator.first_name} ${petition.creator.last_name}`}
+                  </span>
                   <span>•</span>
                   <span>{new Date(petition.created_at).toLocaleDateString()}</span>
                   <span>•</span>
@@ -251,8 +246,8 @@ export default function PetitionDetail() {
                     src={petition.image_url}
                     alt={petition.title}
                     className="w-full h-64 object-cover rounded-lg"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = 'none'
+                    onError={e => {
+                      ;(e.target as HTMLImageElement).style.display = 'none'
                     }}
                   />
                 </div>
@@ -262,13 +257,14 @@ export default function PetitionDetail() {
               <div className="mb-8">
                 <h2 className="text-xl font-semibold mb-4">Why this petition matters</h2>
                 <div className="prose max-w-none">
-                  {petition.description.split('\n').map((paragraph, index) => (
-                    paragraph.trim() && (
-                      <p key={index} className="mb-4 text-gray-700 leading-relaxed">
-                        {paragraph}
-                      </p>
-                    )
-                  ))}
+                  {petition.description.split('\n').map(
+                    (paragraph, index) =>
+                      paragraph.trim() && (
+                        <p key={index} className="mb-4 text-gray-700 leading-relaxed">
+                          {paragraph}
+                        </p>
+                      )
+                  )}
                 </div>
               </div>
             </div>
@@ -279,7 +275,7 @@ export default function PetitionDetail() {
                 Recent Signatures ({petition.current_count.toLocaleString()})
               </h2>
 
-              {signaturesLoading ? (
+              {loading ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map(i => (
                     <div key={i} className="animate-pulse border-b pb-4">
@@ -292,7 +288,7 @@ export default function PetitionDetail() {
                 <p className="text-gray-600">No signatures yet. Be the first to sign!</p>
               ) : (
                 <div className="space-y-4">
-                  {signatures.map((signature) => (
+                  {signatures.map(signature => (
                     <div key={signature.id} className="border-b pb-4 last:border-b-0">
                       <div className="flex justify-between items-start">
                         <div>
@@ -320,7 +316,9 @@ export default function PetitionDetail() {
               {/* Progress */}
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
-                  <span className="font-semibold">{petition.current_count.toLocaleString()} signed</span>
+                  <span className="font-semibold">
+                    {petition.current_count.toLocaleString()} signed
+                  </span>
                   <span>{petition.target_count.toLocaleString()} goal</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
@@ -336,14 +334,12 @@ export default function PetitionDetail() {
               {signed ? (
                 <div className="text-center p-4 bg-green-50 rounded-lg mb-4">
                   <p className="text-green-800 font-medium">✓ Thank you for signing!</p>
-                  <p className="text-sm text-green-600 mt-1">Help spread the word by sharing this petition</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    Help spread the word by sharing this petition
+                  </p>
                 </div>
               ) : petition.status === 'active' ? (
-                <Button
-                  onClick={() => setShowSignForm(true)}
-                  className="w-full mb-4"
-                  size="lg"
-                >
+                <Button onClick={() => setShowSignForm(true)} className="w-full mb-4" size="lg">
                   Sign This Petition
                 </Button>
               ) : (
@@ -385,7 +381,7 @@ export default function PetitionDetail() {
                       <label className="block text-sm font-medium mb-1">First Name *</label>
                       <Input
                         value={signForm.firstName}
-                        onChange={(e) => setSignForm({...signForm, firstName: e.target.value})}
+                        onChange={e => setSignForm({ ...signForm, firstName: e.target.value })}
                         className={signErrors.firstName ? 'border-red-300' : ''}
                       />
                       {signErrors.firstName && (
@@ -396,7 +392,7 @@ export default function PetitionDetail() {
                       <label className="block text-sm font-medium mb-1">Last Name *</label>
                       <Input
                         value={signForm.lastName}
-                        onChange={(e) => setSignForm({...signForm, lastName: e.target.value})}
+                        onChange={e => setSignForm({ ...signForm, lastName: e.target.value })}
                         className={signErrors.lastName ? 'border-red-300' : ''}
                       />
                       {signErrors.lastName && (
@@ -410,7 +406,7 @@ export default function PetitionDetail() {
                     <Input
                       type="email"
                       value={signForm.email}
-                      onChange={(e) => setSignForm({...signForm, email: e.target.value})}
+                      onChange={e => setSignForm({ ...signForm, email: e.target.value })}
                       className={signErrors.email ? 'border-red-300' : ''}
                     />
                     {signErrors.email && (
@@ -423,7 +419,7 @@ export default function PetitionDetail() {
                     <Textarea
                       rows={3}
                       value={signForm.comment}
-                      onChange={(e) => setSignForm({...signForm, comment: e.target.value})}
+                      onChange={e => setSignForm({ ...signForm, comment: e.target.value })}
                       placeholder="Why are you signing this petition?"
                       maxLength={500}
                     />
@@ -435,7 +431,7 @@ export default function PetitionDetail() {
                       type="checkbox"
                       id="anonymous"
                       checked={signForm.anonymous}
-                      onChange={(e) => setSignForm({...signForm, anonymous: e.target.checked})}
+                      onChange={e => setSignForm({ ...signForm, anonymous: e.target.checked })}
                       className="mt-1"
                     />
                     <label htmlFor="anonymous" className="text-sm text-gray-700">
@@ -453,11 +449,7 @@ export default function PetitionDetail() {
                     >
                       Cancel
                     </Button>
-                    <Button
-                      type="submit"
-                      disabled={signing}
-                      className="flex-1"
-                    >
+                    <Button type="submit" disabled={signing} className="flex-1">
                       {signing ? 'Signing...' : 'Sign Petition'}
                     </Button>
                   </div>

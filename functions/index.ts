@@ -7,6 +7,7 @@ import { onRequest as usersHandler } from './api/users'
 import { onRequest as userByIdHandler } from './api/users/[id]'
 import { onRequest as petitionsHandler } from './api/petitions'
 import { onRequest as petitionByIdHandler } from './api/petitions/[id]'
+import { onRequest as petitionBySlugHandler } from './api/petition/[slug]'
 import { onRequest as petitionSignaturesHandler } from './api/petitions/[id]/signatures'
 import { onRequest as signaturesHandler } from './api/signatures'
 import { onRequest as categoriesHandler } from './api/categories'
@@ -60,6 +61,11 @@ export default {
       
       if (path === '/api/petitions') {
         return await petitionsHandler(createContext(request, env))
+      }
+      
+      if (path.match(/^\/api\/petition\/[^/]+$/)) {
+        const params = parsePathParams(path, '/api/petition/[slug]')
+        return await petitionBySlugHandler(createContext(request, env, params))
       }
       
       if (path.match(/^\/api\/petitions\/\d+\/signatures$/)) {
