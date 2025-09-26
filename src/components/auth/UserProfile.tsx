@@ -50,7 +50,7 @@ export default function UserProfile() {
             className="fixed inset-0 z-10"
             onClick={() => setShowMenu(false)}
           />
-          <Card className="absolute right-0 top-full mt-2 w-56 z-20 shadow-lg border border-gray-200">
+          <Card className="absolute right-0 top-full mt-2 w-56 z-20 shadow-lg border border-gray-200 bg-white">
             <CardContent className="p-4">
               <div className="border-b border-gray-200 pb-3 mb-3">
                 <p className="font-medium text-gray-900">{user.name}</p>
