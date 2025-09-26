@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { Helmet } from 'react-helmet-async'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { petitionApi } from '@/services/api'
@@ -128,64 +127,18 @@ export default function PetitionDetail() {
   const progressPercentage = Math.round((petition.current_count / petition.target_count) * 100)
   const daysLeft = calculateDaysLeft(petition.created_at)
 
-  const petitionUrl = `${window.location.origin}/petitions/${petition.slug}`
-  const pageTitle = `${petition.title} | Philippine Petition Platform`
-  const pageDescription = petition.description.slice(0, 160) + (petition.description.length > 160 ? '...' : '')
+  // Set document title
+  useEffect(() => {
+    if (petition) {
+      document.title = `${petition.title} | Philippine Petition Platform`
+    }
+    return () => {
+      document.title = 'Philippine Petition Platform'
+    }
+  }, [petition])
 
   return (
     <>
-      <Helmet>
-        {/* Basic SEO */}
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <link rel="canonical" href={petitionUrl} />
-
-        {/* Open Graph / Facebook */}
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={petitionUrl} />
-        <meta property="og:title" content={petition.title} />
-        <meta property="og:description" content={pageDescription} />
-        {petition.image_url && <meta property="og:image" content={petition.image_url} />}
-        <meta property="og:site_name" content="Philippine Petition Platform" />
-        <meta property="og:locale" content="en_PH" />
-
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:url" content={petitionUrl} />
-        <meta name="twitter:title" content={petition.title} />
-        <meta name="twitter:description" content={pageDescription} />
-        {petition.image_url && <meta name="twitter:image" content={petition.image_url} />}
-
-        {/* Additional SEO */}
-        <meta name="keywords" content={`petition, philippines, ${petition.categories.map(c => c.name.toLowerCase()).join(', ')}, ${petition.type}`} />
-        <meta name="author" content={petition.creator.name || 'Philippine Petition Platform'} />
-        <meta name="robots" content="index, follow" />
-
-        {/* JSON-LD Structured Data */}
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Petition",
-            "name": petition.title,
-            "description": pageDescription,
-            "url": petitionUrl,
-            "image": petition.image_url,
-            "author": {
-              "@type": "Person",
-              "name": petition.creator.name || "Anonymous"
-            },
-            "dateCreated": petition.created_at,
-            "targetCollection": petition.target_count,
-            "signatureCount": petition.current_count,
-            "location": petition.location,
-            "category": petition.categories.map(c => c.name).join(", "),
-            "publisher": {
-              "@type": "Organization",
-              "name": "Philippine Petition Platform"
-            }
-          })}
-        </script>
-      </Helmet>
 
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
