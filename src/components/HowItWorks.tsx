@@ -2,10 +2,6 @@ import { Link } from 'react-router-dom'
 import { Button } from './ui/button'
 import { Card, CardContent } from './ui/card'
 import {
-  PenTool,
-  Users,
-  Target,
-  Share2,
   CheckCircle,
   Globe,
   MapPin,
@@ -20,7 +16,7 @@ export default function HowItWorks() {
       step: 1,
       title: "Create Your Petition",
       description: "Sign in and create a compelling petition with a clear title, detailed description, and supporting images.",
-      icon: PenTool,
+      image: "https://images.pexels.com/photos/6801874/pexels-photo-6801874.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
         "Choose between local or national petition",
         "Add rich markdown descriptions",
@@ -33,7 +29,7 @@ export default function HowItWorks() {
       step: 2,
       title: "Share & Promote",
       description: "Share your petition across social media, email, and other channels to reach supporters.",
-      icon: Share2,
+      image: "https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
         "Share on Facebook, Twitter, WhatsApp",
         "Copy direct links to share anywhere",
@@ -46,7 +42,7 @@ export default function HowItWorks() {
       step: 3,
       title: "Gather Support",
       description: "Watch as people sign your petition and add their voices to your cause.",
-      icon: Users,
+      image: "https://images.pexels.com/photos/1708936/pexels-photo-1708936.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
         "Supporters can sign with or without comments",
         "Anonymous signing option available",
@@ -59,7 +55,7 @@ export default function HowItWorks() {
       step: 4,
       title: "Make an Impact",
       description: "Use your petition signatures to approach decision-makers and create change.",
-      icon: Target,
+      image: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
         "Present signatures to relevant authorities",
         "Use public support to gain media attention",
@@ -166,8 +162,12 @@ export default function HowItWorks() {
             {steps.map((step, index) => (
               <div key={step.step} className="flex flex-col lg:flex-row items-center gap-8">
                 <div className={`flex-shrink-0 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                  <div className="w-80 h-64 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center">
-                    <step.icon className="w-24 h-24 text-blue-600" />
+                  <div className="w-80 h-64 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl overflow-hidden">
+                    <img
+                      src={step.image}
+                      alt={step.title}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
 
