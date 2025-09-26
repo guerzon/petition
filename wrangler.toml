@@ -1,0 +1,32 @@
+name = "petition"
+main = "./functions/index.ts"
+compatibility_date = "2024-09-25"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Auth.js environment variables (set these in Cloudflare Workers dashboard or use wrangler secret)
+# AUTH_SECRET = "your-secret-here"
+# GOOGLE_CLIENT_ID = "your-google-client-id"
+# FACEBOOK_CLIENT_ID = "your-facebook-app-id"
+
+# For secrets (use: wrangler secret put VARIABLE_NAME)
+# - AUTH_SECRET
+# - GOOGLE_CLIENT_SECRET
+# - FACEBOOK_CLIENT_SECRET
+
+[[d1_databases]]
+binding = "DB"
+database_name = "petition-db"
+database_id = "4fd4c724-020d-4eed-b3e7-959c8f38a786"
+
+[env.production]
+name = "petition-db"
+
+[env.production.d1_databases]
+binding = "DB"
+
+[env.staging]
+name = "petition-app-staging"
+
+[env.staging.d1_databases]
+binding = "DB"
