@@ -19,6 +19,8 @@
     "db:create": "wrangler d1 create petition-db --location apac"
   },
   "dependencies": {
+    "@auth/core": "^0.40.0",
+    "@auth/d1-adapter": "^1.10.0",
     "@cloudflare/vite-plugin": "^1.13.5",
     "@icons-pack/react-simple-icons": "^13.7.0",
     "@radix-ui/react-slot": "^1.2.3",

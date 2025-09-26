@@ -3,6 +3,8 @@ import { X, Menu, ChevronDown, Globe, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LANGUAGES, type LanguageType } from '../../i18n/languages'
+import { useAuth } from '@/hooks/useAuth'
+import UserProfile from '@/components/auth/UserProfile'
 
 const mainNavigation = [
   {
@@ -35,6 +37,7 @@ const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const { t, i18n } = useTranslation('common')
+  const { status } = useAuth()
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -150,6 +153,17 @@ const Navbar: React.FC = () => {
               <Search className="h-4 w-4 mr-1" />
               Search
             </Link>
+
+            {status === 'authenticated' ? (
+              <UserProfile />
+            ) : (
+              <Link
+                to="/auth/signin"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -231,6 +245,23 @@ const Navbar: React.FC = () => {
           >
             Sitemap
           </Link>
+
+          {status === 'authenticated' ? (
+            <div className="px-4 py-3 border-t border-gray-200">
+              <UserProfile />
+            </div>
+          ) : (
+            <div className="px-4 py-3 border-t border-gray-200">
+              <Link
+                to="/auth/signin"
+                onClick={closeMenu}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors block text-center"
+              >
+                Sign In
+              </Link>
+            </div>
+          )}
+
           <div className="px-4 py-3 border-t border-gray-200">
             <div className="flex items-center">
               <Globe className="h-5 w-5 text-gray-800 mr-2" />

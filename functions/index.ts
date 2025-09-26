@@ -11,6 +11,7 @@ import { onRequest as petitionBySlugHandler } from './api/petition/[slug]'
 import { onRequest as petitionSignaturesHandler } from './api/petitions/[id]/signatures'
 import { onRequest as signaturesHandler } from './api/signatures'
 import { onRequest as categoriesHandler } from './api/categories'
+import { onRequest as authHandler } from './auth/[...auth]'
 
 function createContext(request: Request, env: Env, params: Record<string, string> = {}): EventContext<Env> {
   return {
@@ -46,6 +47,12 @@ export default {
 
     try {
       // Route to appropriate function handler
+
+      // Auth routes - handle all /auth/* paths
+      if (path.startsWith('/auth/')) {
+        return await authHandler(createContext(request, env))
+      }
+
       if (path === '/api/test') {
         return await testHandler(createContext(request, env))
       }
