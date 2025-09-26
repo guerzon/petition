@@ -1,5 +1,5 @@
-import { CreateSignatureInput } from '../../src/db/schemas/types'
-import { Env, EventContext } from '../_shared/types'
+import type { CreateSignatureInput } from '../../src/db/schemas/types'
+import type { Env, EventContext } from '../_shared/types'
 import { handleCORS, createErrorResponse, createSuccessResponse, getDbService } from '../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {

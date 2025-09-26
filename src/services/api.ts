@@ -13,12 +13,12 @@ import type {
 const API_BASE_URL = '' // Always use relative URLs - Vite plugin handles routing
 
 class ApiError extends Error {
-  constructor(
-    public status: number,
-    message: string
-  ) {
+  public status: number
+  
+  constructor(status: number, message: string) {
     super(message)
     this.name = 'ApiError'
+    this.status = status
   }
 }
 

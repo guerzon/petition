@@ -1,5 +1,5 @@
 import { DatabaseService } from '../../src/db/service'
-import { Env, EventContext } from './types'
+import type { Env, EventContext } from './types'
 
 export const corsHeaders = {
   'Access-Control-Allow-Origin': '*',

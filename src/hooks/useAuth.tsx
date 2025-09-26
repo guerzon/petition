@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await fetch('/auth/session')
       if (response.ok) {
-        const sessionData = await response.json()
+        const sessionData = await response.json() as Session | null
         if (sessionData?.user) {
           setSession(sessionData)
           setStatus('authenticated')
@@ -55,7 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // First get the CSRF token
       const csrfResponse = await fetch('/auth/csrf')
-      const { csrfToken } = await csrfResponse.json()
+      const csrfData = await csrfResponse.json() as { csrfToken: string }
+      const { csrfToken } = csrfData
 
       // Create a form to POST to signin with CSRF protection
       const form = document.createElement('form')
@@ -93,7 +94,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       // Get CSRF token for sign out
       const csrfResponse = await fetch('/auth/csrf')
-      const { csrfToken } = await csrfResponse.json()
+      const csrfData = await csrfResponse.json() as { csrfToken: string }
+      const { csrfToken } = csrfData
 
       // Create a form to POST to signout with CSRF protection
       const form = document.createElement('form')

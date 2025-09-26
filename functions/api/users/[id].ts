@@ -1,4 +1,4 @@
-import { Env, EventContext } from '../../_shared/types'
+import type { Env, EventContext } from '../../_shared/types'
 import { handleCORS, createErrorResponse, createSuccessResponse, createNotFoundResponse, getDbService } from '../../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
@@ -7,9 +7,9 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
 
   try {
     const db = getDbService(context)
-    const userId = parseInt(context.params.id)
+    const userId = context.params.id
     
-    if (isNaN(userId)) {
+    if (!userId) {
       return createErrorResponse('Invalid user ID', 400)
     }
 

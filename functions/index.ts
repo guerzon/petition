@@ -1,5 +1,5 @@
 // Main Cloudflare Worker entry point - routes to individual functions
-import { Env, EventContext } from './_shared/types'
+import type { Env, EventContext } from './_shared/types'
 
 // Import individual function handlers
 import { onRequest as testHandler } from './api/test'

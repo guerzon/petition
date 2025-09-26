@@ -68,7 +68,7 @@ export function createAuthConfig(env: Env): AuthConfig {
         }
         return session
       },
-      async jwt({ token, user, account }) {
+      async jwt({ token, user }) {
         console.log('JWT callback:', { hasToken: !!token, hasUser: !!user, userImage: user?.image })
         // Add user ID to JWT token
         if (user?.id) {
@@ -93,7 +93,7 @@ export function createAuthConfig(env: Env): AuthConfig {
     providersCount: config.providers.length,
     hasAdapter: !!config.adapter,
     hasSecret: !!config.secret,
-    providersTypes: config.providers.map(p => p.id)
+    providersTypes: config.providers.map(p => (p as any).id || 'unknown')
   })
 
   return config

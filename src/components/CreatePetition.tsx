@@ -35,7 +35,7 @@ export default function CreatePetition() {
   })
 
   const [categories, setCategories] = useState<Category[]>([])
-  const [errors, setErrors] = useState<Partial<CreatePetitionFormData>>({})
+  const [errors, setErrors] = useState<Partial<Record<keyof CreatePetitionFormData, string>>>({})
   const [submitError, setSubmitError] = useState<string>('')
 
   // Load categories on component mount
@@ -106,7 +106,7 @@ export default function CreatePetition() {
   }, [])
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<CreatePetitionFormData> = {}
+    const newErrors: Partial<Record<keyof CreatePetitionFormData, string>> = {}
 
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required'
@@ -134,14 +134,7 @@ export default function CreatePetition() {
     return Object.keys(newErrors).length === 0
   }
 
-  const isValidUrl = (url: string): boolean => {
-    try {
-      new URL(url)
-      return true
-    } catch {
-      return false
-    }
-  }
+  // Removed unused isValidUrl function
 
   const handleInputChange = (
     field: keyof CreatePetitionFormData,
@@ -191,7 +184,7 @@ export default function CreatePetition() {
       ? formData.categories.filter(id => id !== categoryId)
       : [...formData.categories, categoryId]
 
-    handleInputChange('categories', updatedCategories)
+    handleInputChange('categories', updatedCategories.map(String))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -214,7 +207,7 @@ export default function CreatePetition() {
         anonymous: false,
       }
 
-      let userId = 1 // Fallback to user ID 1
+      let userId = '1' // Fallback to user ID '1'
       try {
         const user = await userApi.create(demoUser)
         userId = user.id
@@ -404,7 +397,7 @@ export default function CreatePetition() {
                   onChange={(value) => handleInputChange('description', value || '')}
                   preview="edit"
                   hideToolbar={false}
-                  visibleDragBar={false}
+                  visibleDragbar={false}
                   textareaProps={{
                     placeholder: 'Describe your petition in detail. Include:\n\n- Background information about the issue\n- Why this issue is important to you and others\n- What specific action you\'re requesting\n- Any supporting evidence or examples\n\nYou can use **bold**, *italic*, lists, and other markdown formatting to make your petition more engaging.',
                     style: { minHeight: '200px' },

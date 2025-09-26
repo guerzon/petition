@@ -8,7 +8,7 @@ interface SignInPageProps {
   redirectTo?: string
 }
 
-export default function SignInPage({ onClose, redirectTo }: SignInPageProps) {
+export default function SignInPage({ onClose }: SignInPageProps) {
   const { signIn, status } = useAuth()
 
   // Check if providers are configured (basic check)
