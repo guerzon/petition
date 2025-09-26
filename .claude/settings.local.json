@@ -5,7 +5,9 @@
       "Bash(npm install:*)",
       "Bash(npx:*)",
       "Bash(npm run dev:*)",
-      "Bash(wrangler d1 execute:*)"
+      "Bash(wrangler d1 execute:*)",
+      "Bash(wrangler dev:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []

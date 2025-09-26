@@ -7,6 +7,7 @@ import FeaturedPetitions from './components/FeaturedPetitions'
 import PetitionDetail from './components/PetitionDetail'
 import Footer from './components/layout/Footer'
 import SignInPage from './components/auth/SignInPage'
+import AuthErrorPage from './components/auth/AuthErrorPage'
 import { AuthProvider } from './hooks/useAuth'
 
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
@@ -34,6 +35,7 @@ function App() {
               <Route path="/petitions" element={<AllPetitions />} />
               <Route path="/featured" element={<FeaturedPetitions />} />
               <Route path="/auth/signin" element={<SignInPage />} />
+              <Route path="/auth/error" element={<AuthErrorPage />} />
             </Routes>
           </main>
           <Footer />

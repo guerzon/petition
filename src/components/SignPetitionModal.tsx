@@ -61,7 +61,7 @@ export default function SignPetitionModal({
       // Create signature using authenticated user
       await signatureApi.create({
         petition_id: petition.id,
-        user_id: parseInt(session!.user.id),
+        user_id: session!.user.id, // Now TEXT, not INTEGER
         comment: signForm.comment.trim() || undefined,
         anonymous: signForm.anonymous,
         ip_address: undefined, // Would be set server-side in real app

@@ -26,3 +26,6 @@ dist-ssr
 *.sqlite**
 test-results/**/**
 playwright-report/**/**
+.env
+settings.local.json
+.wrangler/

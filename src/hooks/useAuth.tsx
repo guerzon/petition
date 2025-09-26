@@ -53,8 +53,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (provider: 'google' | 'facebook') => {
     try {
-      // Redirect to Auth.js provider sign-in
-      window.location.href = `/auth/signin/${provider}`
+      // First get the CSRF token
+      const csrfResponse = await fetch('/auth/csrf')
+      const { csrfToken } = await csrfResponse.json()
+
+      // Create a form to POST to signin with CSRF protection
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = `/auth/signin/${provider}`
+
+      // Add CSRF token
+      const csrfInput = document.createElement('input')
+      csrfInput.type = 'hidden'
+      csrfInput.name = 'csrfToken'
+      csrfInput.value = csrfToken
+      form.appendChild(csrfInput)
+
+      // Add callback URL
+      const callbackInput = document.createElement('input')
+      callbackInput.type = 'hidden'
+      callbackInput.name = 'callbackUrl'
+      callbackInput.value = window.location.href
+      form.appendChild(callbackInput)
+
+      // Submit the form
+      document.body.appendChild(form)
+      form.submit()
     } catch (error) {
       console.error('Sign in failed:', error)
     }
