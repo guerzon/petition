@@ -56,13 +56,13 @@ wrangler login
 #### Create Local D1 Database
 
 ```bash
-# Create the database
-wrangler d1 create petition-db --local
+# Create and seed the database
+npm run db:setup
 
 # This will output a database ID - copy it to wrangler.toml
 ```
 
-#### Update wrangler.toml
+#### Or manually update wrangler.toml
 
 Replace the `database_id` in `wrangler.toml` with your new database ID:
 

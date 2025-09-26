@@ -14,10 +14,9 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "db:create": "wrangler d1 create petition-db --location apac",
-    "db:migrate": "wrangler d1 execute petition-db --file=./src/db/migrations/001_create_tables.sql",
-    "db:migrate:002": "wrangler d1 execute petition-db --file=./src/db/migrations/002_add_due_date_and_slug.sql",
-    "db:seed": "wrangler d1 execute petition-db --file=./src/db/seeds/001_seed_data.sql"
+    "db:setup": "wrangler d1 execute petition-db --file=./src/db/migrations/001_create_tables_with_seed.sql",
+    "db:reset": "wrangler d1 execute petition-db --command='DROP TABLE IF EXISTS petition_categories; DROP TABLE IF EXISTS signatures; DROP TABLE IF EXISTS petitions; DROP TABLE IF EXISTS categories; DROP TABLE IF EXISTS users;' && npm run db:setup",
+    "db:create": "wrangler d1 create petition-db --location apac"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.13.5",
