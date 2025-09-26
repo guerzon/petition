@@ -46,6 +46,15 @@ export default function PetitionDetail() {
     }
   }, [slug, fetchPetition])
 
+  // Set document title
+  useEffect(() => {
+    if (petition) {
+      document.title = `${petition.title} | Philippine Petition Platform`
+    }
+    return () => {
+      document.title = 'Philippine Petition Platform'
+    }
+  }, [petition])
 
   const calculateDaysLeft = (createdAt: string): number => {
     const created = new Date(createdAt)
@@ -126,16 +135,6 @@ export default function PetitionDetail() {
 
   const progressPercentage = Math.round((petition.current_count / petition.target_count) * 100)
   const daysLeft = calculateDaysLeft(petition.created_at)
-
-  // Set document title
-  useEffect(() => {
-    if (petition) {
-      document.title = `${petition.title} | Philippine Petition Platform`
-    }
-    return () => {
-      document.title = 'Philippine Petition Platform'
-    }
-  }, [petition])
 
   return (
     <>
