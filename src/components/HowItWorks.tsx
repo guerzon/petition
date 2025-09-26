@@ -9,59 +9,62 @@ import {
   Clock,
   TrendingUp
 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export default function HowItWorks() {
+  const { t } = useTranslation('common')
+
   const steps = [
     {
       step: 1,
-      title: "Create Your Petition",
-      description: "Sign in and create a compelling petition with a clear title, detailed description, and supporting images.",
+      title: t('howItWorks.step1.title'),
+      description: t('howItWorks.step1.description'),
       image: "https://images.pexels.com/photos/6801874/pexels-photo-6801874.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
-        "Choose between local or national petition",
-        "Add rich markdown descriptions",
-        "Upload supporting images",
-        "Select relevant categories",
-        "Set your signature goal"
+        t('howItWorks.step1.detail1'),
+        t('howItWorks.step1.detail2'),
+        t('howItWorks.step1.detail3'),
+        t('howItWorks.step1.detail4'),
+        t('howItWorks.step1.detail5')
       ]
     },
     {
       step: 2,
-      title: "Share & Promote",
-      description: "Share your petition across social media, email, and other channels to reach supporters.",
+      title: t('howItWorks.step2.title'),
+      description: t('howItWorks.step2.description'),
       image: "https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
-        "Share on Facebook, Twitter, WhatsApp",
-        "Copy direct links to share anywhere",
-        "Email friends and family",
-        "Post in relevant online communities",
-        "Share in local groups and organizations"
+        t('howItWorks.step2.detail1'),
+        t('howItWorks.step2.detail2'),
+        t('howItWorks.step2.detail3'),
+        t('howItWorks.step2.detail4'),
+        t('howItWorks.step2.detail5')
       ]
     },
     {
       step: 3,
-      title: "Gather Support",
-      description: "Watch as people sign your petition and add their voices to your cause.",
+      title: t('howItWorks.step3.title'),
+      description: t('howItWorks.step3.description'),
       image: "https://images.pexels.com/photos/1708936/pexels-photo-1708936.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
-        "Supporters can sign with or without comments",
-        "Anonymous signing option available",
-        "Real-time signature count updates",
-        "See supporter comments and engagement",
-        "Track progress toward your goal"
+        t('howItWorks.step3.detail1'),
+        t('howItWorks.step3.detail2'),
+        t('howItWorks.step3.detail3'),
+        t('howItWorks.step3.detail4'),
+        t('howItWorks.step3.detail5')
       ]
     },
     {
       step: 4,
-      title: "Make an Impact",
-      description: "Use your petition signatures to approach decision-makers and create change.",
+      title: t('howItWorks.step4.title'),
+      description: t('howItWorks.step4.description'),
       image: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=400&h=300&fit=crop",
       details: [
-        "Present signatures to relevant authorities",
-        "Use public support to gain media attention",
-        "Organize follow-up actions and events",
-        "Keep supporters updated on progress",
-        "Celebrate victories and milestones"
+        t('howItWorks.step4.detail1'),
+        t('howItWorks.step4.detail2'),
+        t('howItWorks.step4.detail3'),
+        t('howItWorks.step4.detail4'),
+        t('howItWorks.step4.detail5')
       ]
     }
   ]
@@ -69,50 +72,50 @@ export default function HowItWorks() {
   const features = [
     {
       icon: Globe,
-      title: "National & Local Campaigns",
-      description: "Create petitions for issues affecting your neighborhood or the entire country."
+      title: t('howItWorks.feature1.title'),
+      description: t('howItWorks.feature1.description')
     },
     {
       icon: Shield,
-      title: "Verified & Secure",
-      description: "All petition creators are verified through secure sign-in, ensuring authentic campaigns."
+      title: t('howItWorks.feature2.title'),
+      description: t('howItWorks.feature2.description')
     },
     {
       icon: Clock,
-      title: "60-Day Window",
-      description: "Petitions remain active for 60 days, creating urgency and focused action periods."
+      title: t('howItWorks.feature3.title'),
+      description: t('howItWorks.feature3.description')
     },
     {
       icon: TrendingUp,
-      title: "Real-Time Progress",
-      description: "Track signatures, engagement, and momentum with live updates and progress bars."
+      title: t('howItWorks.feature4.title'),
+      description: t('howItWorks.feature4.description')
     }
   ]
 
   const petitionTypes = [
     {
-      type: "Local Petitions",
+      type: t('howItWorks.localPetitions'),
       icon: MapPin,
-      description: "Address issues in your city, county, or state",
+      description: t('howItWorks.localDescription'),
       examples: [
-        "Save a local park from development",
-        "Improve school bus safety in your district",
-        "Fund community programs",
-        "Fix local infrastructure issues",
-        "Change local government policies"
+        t('howItWorks.localExample1'),
+        t('howItWorks.localExample2'),
+        t('howItWorks.localExample3'),
+        t('howItWorks.localExample4'),
+        t('howItWorks.localExample5')
       ],
       color: "bg-green-50 border-green-200 text-green-800"
     },
     {
-      type: "National Petitions",
+      type: t('howItWorks.nationalPetitions'),
       icon: Globe,
-      description: "Tackle issues that affect the entire country",
+      description: t('howItWorks.nationalDescription'),
       examples: [
-        "Healthcare reform and access",
-        "Environmental protection laws",
-        "Education policy changes",
-        "Economic and social justice",
-        "Technology and digital rights"
+        t('howItWorks.nationalExample1'),
+        t('howItWorks.nationalExample2'),
+        t('howItWorks.nationalExample3'),
+        t('howItWorks.nationalExample4'),
+        t('howItWorks.nationalExample5')
       ],
       color: "bg-blue-50 border-blue-200 text-blue-800"
     }
@@ -125,20 +128,20 @@ export default function HowItWorks() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
-              How Petitions Work
+              {t('howItWorks.title')}
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-8">
-              Learn how to create, promote, and use petitions to drive real change in your community and beyond
+              {t('howItWorks.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/create">
                 <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg">
-                  Start a Petition
+                  {t('howItWorks.startPetition')}
                 </Button>
               </Link>
               <Link to="/petitions">
                 <Button variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-3 text-lg">
-                  Browse Petitions
+                  {t('howItWorks.browsePetitions')}
                 </Button>
               </Link>
             </div>
@@ -151,10 +154,10 @@ export default function HowItWorks() {
         <section className="mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              4 Simple Steps to Create Change
+              {t('howItWorks.stepsTitle')}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From idea to impact, here's how petitions work on our platform
+              {t('howItWorks.stepsSubtitle')}
             </p>
           </div>
 
@@ -199,10 +202,10 @@ export default function HowItWorks() {
         <section className="mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Types of Petitions
+              {t('howItWorks.typesTitle')}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Whether your issue is local or national, we've got you covered
+              {t('howItWorks.typesSubtitle')}
             </p>
           </div>
 
@@ -220,7 +223,7 @@ export default function HowItWorks() {
                   <p className="text-gray-600 mb-6">{type.description}</p>
 
                   <div>
-                    <h4 className="font-semibold text-gray-900 mb-3">Popular Examples:</h4>
+                    <h4 className="font-semibold text-gray-900 mb-3">{t('howItWorks.popularExamples')}</h4>
                     <ul className="space-y-2">
                       {type.examples.map((example, index) => (
                         <li key={index} className="flex items-center gap-3">
@@ -240,10 +243,10 @@ export default function HowItWorks() {
         <section className="mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Platform Features
+              {t('howItWorks.featuresTitle')}
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Built-in tools to maximize your petition's impact and reach
+              {t('howItWorks.featuresSubtitle')}
             </p>
           </div>
 
@@ -267,50 +270,50 @@ export default function HowItWorks() {
           <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl p-8 md:p-12">
             <div className="max-w-4xl mx-auto">
               <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
-                Tips for Success
+                {t('howItWorks.tipsTitle')}
               </h2>
 
               <div className="grid md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Creating Your Petition</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('howItWorks.creatingTitle')}</h3>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Write a clear, compelling title that summarizes your cause</span>
+                      <span className="text-gray-700">{t('howItWorks.tip1')}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Include specific details about the problem and solution</span>
+                      <span className="text-gray-700">{t('howItWorks.tip2')}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Add photos or images to make your petition more engaging</span>
+                      <span className="text-gray-700">{t('howItWorks.tip3')}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Set a realistic but ambitious signature goal</span>
+                      <span className="text-gray-700">{t('howItWorks.tip4')}</span>
                     </li>
                   </ul>
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-4">Promoting Your Petition</h3>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-4">{t('howItWorks.promotingTitle')}</h3>
                   <ul className="space-y-3">
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Share on all your social media platforms</span>
+                      <span className="text-gray-700">{t('howItWorks.tip5')}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Email friends, family, and colleagues personally</span>
+                      <span className="text-gray-700">{t('howItWorks.tip6')}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Reach out to local media and community groups</span>
+                      <span className="text-gray-700">{t('howItWorks.tip7')}</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">Post updates to keep momentum going</span>
+                      <span className="text-gray-700">{t('howItWorks.tip8')}</span>
                     </li>
                   </ul>
                 </div>
@@ -323,20 +326,20 @@ export default function HowItWorks() {
         <section className="text-center">
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Ready to Start Your Petition?
+              {t('howItWorks.ctaTitle')}
             </h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Join thousands of people who are using petitions to create positive change in their communities and beyond.
+              {t('howItWorks.ctaSubtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/create">
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
-                  Create Your Petition
+                  {t('howItWorks.createYourPetition')}
                 </Button>
               </Link>
               <Link to="/petitions">
                 <Button variant="outline" className="border-gray-300 text-gray-700 hover:bg-gray-50 px-8 py-3 text-lg">
-                  Explore Existing Petitions
+                  {t('howItWorks.exploreExistingPetitions')}
                 </Button>
               </Link>
             </div>

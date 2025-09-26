@@ -3,8 +3,8 @@ import { X, Menu, ChevronDown, Globe, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LANGUAGES, type LanguageType } from '../../i18n/languages'
-import { useAuth } from '@/hooks/useAuth'
-import UserProfile from '@/components/auth/UserProfile'
+import { useAuth } from '../../hooks/useAuth'
+import UserProfile from '../auth/UserProfile'
 
 const mainNavigation = [
   {
@@ -69,7 +69,7 @@ const Navbar: React.FC = () => {
               to="/join-us"
               className="text-xs text-primary-600 hover:text-primary-700 font-semibold transition-colors"
             >
-              🚀 Join Us
+              🚀 {t('navbar.join us')}
             </Link>
             <a
               href="https://bettergov.ph"
@@ -83,7 +83,7 @@ const Navbar: React.FC = () => {
               <select
                 value={i18n.language}
                 onChange={e => changeLanguage(e.target.value as LanguageType)}
-                className="text-xs border border-gray-300 rounded-sm px-2 py-1 bg-white text-gray-700 hover:border-primary-600 focus:outline-hidden focus:ring-1 focus:ring-primary-600 focus:border-primary-600"
+                className="text-xs border border-gray-300 rounded-sm px-2 py-1 bg-white text-gray-700 hover:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 focus:border-primary-600"
               >
                 {Object.entries(LANGUAGES).map(([code, lang]) => (
                   <option key={code} value={code}>
@@ -121,7 +121,7 @@ const Navbar: React.FC = () => {
                   to={item.href}
                   className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
                 >
-                  {t(item.label)}
+                  {t(`navbar.${item.label.toLowerCase()}`)}
                   {item.children && item.children.length > 0 && (
                     <ChevronDown className="ml-1 h-4 w-4 text-gray-800 group-hover:text-primary-600 transition-colors" />
                   )}
@@ -151,7 +151,7 @@ const Navbar: React.FC = () => {
               className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
               <Search className="h-4 w-4 mr-1" />
-              Search
+              {t('navbar.search')}
             </Link>
 
             {status === 'authenticated' ? (
@@ -161,7 +161,7 @@ const Navbar: React.FC = () => {
                 to="/auth/signin"
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
-                Sign In
+                {t('navbar.signIn')}
               </Link>
             )}
           </div>
@@ -170,7 +170,7 @@ const Navbar: React.FC = () => {
           <div className="lg:hidden flex items-center">
             <button
               onClick={toggleMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-500 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-primary-500"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-primary-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
             >
               <span className="sr-only">Open main menu</span>
               {isOpen ? (
@@ -222,28 +222,28 @@ const Navbar: React.FC = () => {
             onClick={closeMenu}
             className="block px-4 py-2 text-base font-semibold text-primary-600 hover:bg-primary-50 hover:text-primary-700"
           >
-            🚀 Join Us
+            🚀 {t('navbar.join us')}
           </Link>
           <Link
             to="/about"
             onClick={closeMenu}
             className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
           >
-            About
+            {t('navbar.about')}
           </Link>
           <Link
             to="/search"
             onClick={closeMenu}
             className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
           >
-            Search
+            {t('navbar.search')}
           </Link>
           <Link
             to="/sitemap"
             onClick={closeMenu}
             className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
           >
-            Sitemap
+            {t('navbar.sitemap')}
           </Link>
 
           {status === 'authenticated' ? (
@@ -257,7 +257,7 @@ const Navbar: React.FC = () => {
                 onClick={closeMenu}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors block text-center"
               >
-                Sign In
+                {t('navbar.signIn')}
               </Link>
             </div>
           )}
@@ -268,7 +268,7 @@ const Navbar: React.FC = () => {
               <select
                 value={i18n.language}
                 onChange={e => changeLanguage(e.target.value as LanguageType)}
-                className="text-sm border border-gray-300 rounded-sm px-2 py-1 bg-white text-gray-700 hover:border-primary-600 focus:outline-hidden focus:ring-1 focus:ring-primary-600 focus:border-primary-600"
+                className="text-sm border border-gray-300 rounded-sm px-2 py-1 bg-white text-gray-700 hover:border-primary-600 focus:outline-none focus:ring-1 focus:ring-primary-600 focus:border-primary-600"
               >
                 {Object.entries(LANGUAGES).map(([code, lang]) => (
                   <option key={code} value={code}>

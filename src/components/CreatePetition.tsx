@@ -8,6 +8,7 @@ import { petitionApi, categoryApi, ApiError } from '../services/api'
 import type { Category } from '../types/api'
 import MDEditor from '@uiw/react-md-editor'
 import { useAuth } from '../hooks/useAuth'
+import { useTranslation } from 'react-i18next'
 
 interface CreatePetitionFormData {
   title: string
@@ -23,6 +24,7 @@ interface CreatePetitionFormData {
 export default function CreatePetition() {
   const navigate = useNavigate()
   const { session, status, signIn } = useAuth()
+  const { t } = useTranslation('common')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [formData, setFormData] = useState<CreatePetitionFormData>({
@@ -111,23 +113,23 @@ export default function CreatePetition() {
     const newErrors: Partial<Record<keyof CreatePetitionFormData, string>> = {}
 
     if (!formData.title.trim()) {
-      newErrors.title = 'Title is required'
+      newErrors.title = t('create.titleRequired')
     } else if (formData.title.length < 10) {
-      newErrors.title = 'Title must be at least 10 characters long'
+      newErrors.title = t('create.titleTooShort')
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Description is required'
+      newErrors.description = t('create.descriptionRequired')
     } else if (formData.description.length < 100) {
-      newErrors.description = 'Description must be at least 100 characters long'
+      newErrors.description = t('create.descriptionTooShort')
     }
 
     if (formData.type === 'local' && !formData.location.trim()) {
-      newErrors.location = 'Location is required for local petitions'
+      newErrors.location = t('create.locationRequired')
     }
 
     if (formData.targetCount < 1) {
-      newErrors.targetCount = 'Target signature count must be at least 1'
+      newErrors.targetCount = t('create.targetCountMinimum')
     }
 
     // Image validation is handled during file upload
@@ -162,13 +164,13 @@ export default function CreatePetition() {
 
     // Check file size (5MB limit)
     if (file.size > 5 * 1024 * 1024) {
-      setErrors(prev => ({ ...prev, imageUrl: 'Image size must be less than 5MB' }))
+      setErrors(prev => ({ ...prev, imageUrl: t('create.imageSizeError') }))
       return
     }
 
     // Check file type
     if (!file.type.startsWith('image/')) {
-      setErrors(prev => ({ ...prev, imageUrl: 'Please select a valid image file' }))
+      setErrors(prev => ({ ...prev, imageUrl: t('create.imageTypeError') }))
       return
     }
 
@@ -226,9 +228,9 @@ export default function CreatePetition() {
     } catch (error) {
       console.error('Error creating petition:', error)
       if (error instanceof ApiError) {
-        setSubmitError(`Failed to create petition: ${error.message}`)
+        setSubmitError(`${t('create.error')}: ${error.message}`)
       } else {
-        setSubmitError('An unexpected error occurred. Please try again.')
+        setSubmitError(t('create.unexpectedError'))
       }
     } finally {
       setIsSubmitting(false)
@@ -242,7 +244,7 @@ export default function CreatePetition() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">
-            {status === 'loading' ? 'Checking authentication...' : 'Loading form...'}
+            {status === 'loading' ? t('create.signInRequired') : 'Loading form...'}
           </p>
         </div>
       </div>
@@ -255,9 +257,9 @@ export default function CreatePetition() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Start a Petition</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('create.title')}</h1>
             <p className="text-lg text-gray-600 mb-8">
-              Create a petition to bring about the change you want to see
+              {t('create.subtitle')}
             </p>
 
             <Card className="max-w-md mx-auto p-8">
@@ -269,9 +271,9 @@ export default function CreatePetition() {
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2">Sign In to Continue</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('create.signInRequired')}</h2>
                   <p className="text-gray-600 text-sm">
-                    Sign in to create your petition and help bring about change
+                    {t('create.signInSubtitle')}
                   </p>
                 </div>
 
@@ -287,7 +289,7 @@ export default function CreatePetition() {
                       <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                       <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
                     </svg>
-                    Continue with Google
+                    {t('create.signInWithGoogle')}
                   </Button>
 
                   <Button
@@ -298,7 +300,7 @@ export default function CreatePetition() {
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                     </svg>
-                    Continue with Facebook
+                    {t('create.signInWithFacebook')}
                   </Button>
                 </div>
 
@@ -323,9 +325,9 @@ export default function CreatePetition() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Start a Petition</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{t('create.title')}</h1>
           <p className="mt-2 text-lg text-gray-600">
-            Create a petition to bring about the change you want to see
+            {t('create.subtitle')}
           </p>
         </div>
 
@@ -339,7 +341,7 @@ export default function CreatePetition() {
             {/* Petition Type Selection */}
             <div>
               <label className="text-base font-medium text-gray-900">
-                What type of petition is this?
+                {t('create.petitionType')}
               </label>
               <p className="text-sm leading-5 text-gray-500 mb-4">
                 Choose whether your petition addresses local or national issues
@@ -364,11 +366,11 @@ export default function CreatePetition() {
                         className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
                       <label htmlFor="local" className="ml-3 text-lg font-medium text-gray-900">
-                        Local Petition
+                        {t('create.local')}
                       </label>
                     </div>
                     <p className="mt-2 text-sm text-gray-600">
-                      Address issues in your city, county, or state
+                      {t('create.localDescription')}
                     </p>
                   </div>
                 </Card>
@@ -392,11 +394,11 @@ export default function CreatePetition() {
                         className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                       />
                       <label htmlFor="national" className="ml-3 text-lg font-medium text-gray-900">
-                        National Petition
+                        {t('create.national')}
                       </label>
                     </div>
                     <p className="mt-2 text-sm text-gray-600">
-                      Address issues that affect the entire country
+                      {t('create.nationalDescription')}
                     </p>
                   </div>
                 </Card>
@@ -407,7 +409,7 @@ export default function CreatePetition() {
             {formData.type === 'local' && (
               <div>
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-                  Location *
+                  {t('create.location')} *
                 </label>
                 <p className="text-sm text-gray-500 mb-2">
                   Specify the city, county, or state this petition addresses
@@ -417,7 +419,7 @@ export default function CreatePetition() {
                   id="location"
                   value={formData.location}
                   onChange={e => handleInputChange('location', e.target.value)}
-                  placeholder="e.g., Springfield, MA or Riverside County, CA"
+                  placeholder={t('create.locationPlaceholder')}
                   className={errors.location ? 'border-red-300' : ''}
                 />
                 {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
@@ -427,7 +429,7 @@ export default function CreatePetition() {
             {/* Title */}
             <div>
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">
-                Petition Title *
+                {t('create.petitionTitle')} *
               </label>
               <p className="text-sm text-gray-500 mb-2">
                 Create a clear, compelling title that summarizes your petition
@@ -437,7 +439,7 @@ export default function CreatePetition() {
                 id="title"
                 value={formData.title}
                 onChange={e => handleInputChange('title', e.target.value)}
-                placeholder="e.g., Save Our Local Park from Development"
+                placeholder={t('create.titlePlaceholder')}
                 className={errors.title ? 'border-red-300' : ''}
                 maxLength={150}
               />
@@ -450,7 +452,7 @@ export default function CreatePetition() {
             {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Petition Description *
+                {t('create.petitionDescription')} *
               </label>
               <p className="text-sm text-gray-500 mb-4">
                 Explain the issue, why it matters, and what action you want taken. You can use markdown formatting for better presentation.
@@ -463,7 +465,7 @@ export default function CreatePetition() {
                   hideToolbar={false}
                   visibleDragbar={false}
                   textareaProps={{
-                    placeholder: 'Describe your petition in detail. Include:\n\n- Background information about the issue\n- Why this issue is important to you and others\n- What specific action you\'re requesting\n- Any supporting evidence or examples\n\nYou can use **bold**, *italic*, lists, and other markdown formatting to make your petition more engaging.',
+                    placeholder: t('create.descriptionPlaceholder'),
                     style: { minHeight: '200px' },
                   }}
                   height={300}
@@ -488,7 +490,7 @@ export default function CreatePetition() {
             {/* Image Upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Petition Image (optional)
+                {t('create.petitionImage')}
               </label>
               <p className="text-sm text-gray-500 mb-4">
                 Add an image to make your petition more compelling (Max 5MB)
@@ -509,7 +511,7 @@ export default function CreatePetition() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                           </svg>
                           <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span> or drag and drop
+                            <span className="font-semibold">{t('create.chooseImage')}</span> or drag and drop
                           </p>
                           <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
                         </>
@@ -554,7 +556,7 @@ export default function CreatePetition() {
             {/* Target Count */}
             <div>
               <label htmlFor="targetCount" className="block text-sm font-medium text-gray-700">
-                Target Signatures
+                {t('create.targetSignatures')}
               </label>
               <p className="text-sm text-gray-500 mb-2">
                 Set a goal for how many signatures you want to collect
@@ -576,7 +578,7 @@ export default function CreatePetition() {
             {/* Categories */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Categories
+                {t('create.categories')}
               </label>
               <p className="text-sm text-gray-500 mb-3">
                 Select categories that best describe your petition
@@ -594,7 +596,7 @@ export default function CreatePetition() {
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="">Choose a category to add...</option>
+                  <option value="">{t('create.selectCategories')}</option>
                   {categories
                     .filter(category => !formData.categories.includes(category.id))
                     .map(category => (
@@ -672,7 +674,7 @@ export default function CreatePetition() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting} className="min-w-[120px]">
-                {isSubmitting ? 'Creating...' : 'Create Petition'}
+                {isSubmitting ? t('create.creating') : t('create.createPetition')}
               </Button>
             </div>
           </form>
