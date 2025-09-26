@@ -5,6 +5,7 @@ import CreatePetition from './components/CreatePetition'
 import AllPetitions from './components/AllPetitions'
 import FeaturedPetitions from './components/FeaturedPetitions'
 import PetitionDetail from './components/PetitionDetail'
+import HowItWorks from './components/HowItWorks'
 import Footer from './components/layout/Footer'
 import SignInPage from './components/auth/SignInPage'
 import AuthErrorPage from './components/auth/AuthErrorPage'
@@ -29,6 +30,7 @@ function App() {
                 }
               />
               <Route path="/create" element={<CreatePetition />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/petition/:slug" element={<PetitionDetail />} />
               <Route path="/proposals/:slug" element={<PetitionDetail />} />
               <Route path="/petitions" element={<AllPetitions />} />
