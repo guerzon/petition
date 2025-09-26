@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 
 export default function Hero() {
   const { t } = useTranslation('home')
@@ -10,16 +11,20 @@ export default function Hero() {
           <h1 className="text-4xl md:text-6xl font-bold mb-6 font-[Figtree]">{t('title')}</h1>
           <p className="text-xl md:text-2xl mb-8 text-blue-200">{t('subtitle')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100">
-              Start a Petition
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-primary-600"
-            >
-              Browse Petitions
-            </Button>
+            <Link to="/create">
+              <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100">
+                Start a Petition
+              </Button>
+            </Link>
+            <Link to="/petitions">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white text-white hover:bg-white hover:text-primary-600"
+              >
+                Browse Petitions
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

@@ -29,3 +29,4 @@ playwright-report/**/**
 .env
 settings.local.json
 .wrangler/
+wrangler.toml
