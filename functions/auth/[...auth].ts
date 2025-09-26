@@ -10,15 +10,21 @@ export async function onRequest(context: EventContext<Env>): Promise<Response> {
     const url = new URL(request.url)
     console.log('Auth request URL:', url.pathname, url.search)
 
-    return await Auth(request, createAuthConfig(env))
+    const response = await Auth(request, createAuthConfig(env))
+
+    // Log successful auth responses
+    if (response.status === 302) {
+      const location = response.headers.get('Location')
+      console.log('Auth redirect to:', location)
+    }
+
+    return response
   } catch (error) {
     console.error("Auth error:", error)
 
-    // If it's an UnknownAction error, redirect to error page
+    // Log UnknownAction errors but don't redirect to avoid loops
     if (error instanceof Error && error.message.includes('UnknownAction')) {
-      const errorUrl = new URL('/auth/error', request.url)
-      errorUrl.searchParams.set('error', 'Configuration')
-      return Response.redirect(errorUrl.toString(), 302)
+      console.error('Auth UnknownAction error:', error.message)
     }
 
     return new Response(JSON.stringify({ error: "Authentication error" }), {

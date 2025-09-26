@@ -69,11 +69,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       csrfInput.value = csrfToken
       form.appendChild(csrfInput)
 
-      // Add callback URL
+      // Add callback URL - avoid redirect loops by never redirecting back to auth pages
       const callbackInput = document.createElement('input')
       callbackInput.type = 'hidden'
       callbackInput.name = 'callbackUrl'
-      callbackInput.value = window.location.href
+
+      // If current page is an auth page, redirect to home, otherwise stay on current page
+      const currentPath = window.location.pathname
+      const isAuthPage = currentPath.startsWith('/auth/')
+      callbackInput.value = isAuthPage ? window.location.origin : window.location.href
+
       form.appendChild(callbackInput)
 
       // Submit the form
@@ -86,18 +91,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await fetch('/auth/signout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-      setSession(null)
-      setStatus('unauthenticated')
-      // Redirect to home page
-      window.location.href = '/'
+      // Get CSRF token for sign out
+      const csrfResponse = await fetch('/auth/csrf')
+      const { csrfToken } = await csrfResponse.json()
+
+      // Create a form to POST to signout with CSRF protection
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = '/auth/signout'
+
+      // Add CSRF token
+      const csrfInput = document.createElement('input')
+      csrfInput.type = 'hidden'
+      csrfInput.name = 'csrfToken'
+      csrfInput.value = csrfToken
+      form.appendChild(csrfInput)
+
+      // Add callback URL to redirect after sign out
+      const callbackInput = document.createElement('input')
+      callbackInput.type = 'hidden'
+      callbackInput.name = 'callbackUrl'
+      callbackInput.value = window.location.origin
+      form.appendChild(callbackInput)
+
+      // Submit the form
+      document.body.appendChild(form)
+      form.submit()
     } catch (error) {
       console.error('Sign out failed:', error)
+      // Fallback: clear local state and redirect
+      setSession(null)
+      setStatus('unauthenticated')
+      window.location.href = '/'
     }
   }
 

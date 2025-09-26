@@ -24,13 +24,13 @@ export class DatabaseService {
   // User methods
   async createUser(userData: CreateUserInput): Promise<User> {
     const stmt = this.db.prepare(`
-      INSERT INTO users (first_name, last_name, email, anonymous)
+      INSERT INTO users (name, email, emailVerified, image)
       VALUES (?, ?, ?, ?)
       RETURNING *
     `)
 
     const result = await stmt
-      .bind(userData.first_name, userData.last_name, userData.email, userData.anonymous || false)
+      .bind(userData.name || null, userData.email, userData.emailVerified || null, userData.image || null)
       .first<User>()
 
     if (!result) {
@@ -40,7 +40,7 @@ export class DatabaseService {
     return result
   }
 
-  async getUserById(id: number): Promise<User | null> {
+  async getUserById(id: string): Promise<User | null> {
     const stmt = this.db.prepare('SELECT * FROM users WHERE id = ?')
     return await stmt.bind(id).first<User>()
   }
@@ -119,11 +119,10 @@ export class DatabaseService {
   async getPetitionBySlug(slug: string): Promise<PetitionWithDetails | null> {
     // Get petition with creator info - no expensive JOIN with signatures
     const stmt = this.db.prepare(`
-      SELECT 
+      SELECT
         p.*,
-        u.first_name as creator_first_name,
-        u.last_name as creator_last_name,
-        u.anonymous as creator_anonymous
+        u.name as creator_name,
+        u.email as creator_email
       FROM petitions p
       JOIN users u ON p.created_by = u.id
       WHERE p.slug = ?
@@ -131,9 +130,8 @@ export class DatabaseService {
 
     const petition = await stmt.bind(slug).first<
       Petition & {
-        creator_first_name: string
-        creator_last_name: string
-        creator_anonymous: boolean
+        creator_name: string
+        creator_email: string
       }
     >()
 
@@ -152,9 +150,8 @@ export class DatabaseService {
     return {
       ...petition,
       creator: {
-        first_name: petition.creator_first_name,
-        last_name: petition.creator_last_name,
-        anonymous: petition.creator_anonymous,
+        name: petition.creator_name,
+        email: petition.creator_email,
       },
       categories: categoriesResult.results || [],
     }
@@ -165,9 +162,9 @@ export class DatabaseService {
     const stmt = this.db.prepare(`
       SELECT 
         p.*,
-        u.first_name as creator_first_name,
-        u.last_name as creator_last_name,
-        u.anonymous as creator_anonymous
+        u.name as creator_name,
+        u.email as creator_email,
+        NULL as creator_anonymous
       FROM petitions p
       JOIN users u ON p.created_by = u.id
       WHERE p.id = ?
@@ -175,8 +172,8 @@ export class DatabaseService {
 
     const petition = await stmt.bind(id).first<
       Petition & {
-        creator_first_name: string
-        creator_last_name: string
+        creator_name: string
+        creator_email: string
         creator_anonymous: boolean
       }
     >()
@@ -195,9 +192,8 @@ export class DatabaseService {
     return {
       ...petition,
       creator: {
-        first_name: petition.creator_first_name,
-        last_name: petition.creator_last_name,
-        anonymous: petition.creator_anonymous,
+        name: petition.creator_name,
+        email: petition.creator_email,
       },
       categories: categoriesResult.results || [],
     }
@@ -212,9 +208,9 @@ export class DatabaseService {
     let query = `
       SELECT 
         p.*,
-        u.first_name as creator_first_name,
-        u.last_name as creator_last_name,
-        u.anonymous as creator_anonymous
+        u.name as creator_name,
+        u.email as creator_email,
+        NULL as creator_anonymous
       FROM petitions p
       JOIN users u ON p.created_by = u.id
     `
@@ -231,8 +227,8 @@ export class DatabaseService {
     const stmt = this.db.prepare(query)
     const result = await stmt.bind(...params).all<
       Petition & {
-        creator_first_name: string
-        creator_last_name: string
+        creator_name: string
+        creator_email: string
         creator_anonymous: boolean
       }
     >()
@@ -253,9 +249,8 @@ export class DatabaseService {
       petitionsWithDetails.push({
         ...petition,
         creator: {
-          first_name: petition.creator_first_name,
-          last_name: petition.creator_last_name,
-          anonymous: petition.creator_anonymous,
+          name: petition.creator_name,
+          email: petition.creator_email,
         },
         categories: categoriesResult.results || [],
       })

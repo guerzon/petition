@@ -2,17 +2,13 @@
 // Use types from src/types/api.ts for client-side code
 
 export interface User {
-  id: string // Changed from number to string for Auth.js compatibility
-  first_name: string
-  last_name: string
+  id: string // Auth.js compatible TEXT PRIMARY KEY
+  name?: string // Auth.js user name field
   email: string
-  anonymous: boolean
-  created_at: string
-  updated_at: string
-  // Auth.js fields
-  name?: string
-  image?: string
-  emailVerified?: string
+  emailVerified?: string // Auth.js field
+  image?: string // Auth.js user image field
+  createdAt: string // Auth.js standard timestamp field
+  updatedAt: string // Auth.js standard timestamp field
 }
 
 export interface Petition {
@@ -55,10 +51,10 @@ export interface PetitionCategory {
 }
 
 export interface CreateUserInput {
-  first_name: string
-  last_name: string
+  name?: string
   email: string
-  anonymous?: boolean
+  emailVerified?: string
+  image?: string
 }
 
 export interface CreatePetitionInput {
@@ -82,6 +78,6 @@ export interface CreateSignatureInput {
 }
 
 export interface PetitionWithDetails extends Petition {
-  creator: Pick<User, 'first_name' | 'last_name' | 'anonymous'>
+  creator: Pick<User, 'name' | 'email'>
   categories: Category[]
 }

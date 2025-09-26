@@ -32,23 +32,44 @@ export function createAuthConfig(env: Env): AuthConfig {
     providers,
     callbacks: {
       async signIn({ user, account, profile }) {
-        console.log('SignIn callback:', { user, account: account?.provider, profile: !!profile })
+        console.log('SignIn callback full data:', {
+          user,
+          account: account?.provider,
+          profile
+        })
+
         // Allow sign in for Google and Facebook providers
         if (account?.provider === "google" || account?.provider === "facebook") {
+          // Ensure user image is set from profile (Google uses 'picture' field)
+          if (profile && !user?.image) {
+            const profileImage = profile.picture || profile.image || profile.avatar_url
+            if (profileImage) {
+              console.log('Setting user image from profile:', profileImage)
+              user.image = profileImage
+            }
+          }
           return true
         }
         return false
       },
       async session({ session, user }) {
-        console.log('Session callback:', { hasSession: !!session, hasUser: !!user })
-        // Add user ID to session
-        if (session?.user && user?.id) {
+        console.log('Session callback:', {
+          hasSession: !!session,
+          hasUser: !!user,
+          userImage: user?.image,
+          sessionUserImage: session?.user?.image
+        })
+        // Add user data to session
+        if (session?.user && user) {
           session.user.id = user.id
+          session.user.name = user.name
+          session.user.email = user.email
+          session.user.image = user.image
         }
         return session
       },
       async jwt({ token, user, account }) {
-        console.log('JWT callback:', { hasToken: !!token, hasUser: !!user })
+        console.log('JWT callback:', { hasToken: !!token, hasUser: !!user, userImage: user?.image })
         // Add user ID to JWT token
         if (user?.id) {
           token.id = user.id
