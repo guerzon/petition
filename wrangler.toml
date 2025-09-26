@@ -17,16 +17,8 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "petition-db"
-database_id = "4fd4c724-020d-4eed-b3e7-959c8f38a786"
-
-[env.production]
-name = "petition-db"
-
-[env.production.d1_databases]
-binding = "DB"
+# database_id = "4fd4c724-020d-4eed-b3e7-959c8f38a786"
+database_id = "c59456f6-7137-4c00-a3c7-e9c56ccd820e"
 
 [env.staging]
-name = "petition-app-staging"
-
-[env.staging.d1_databases]
-binding = "DB"
+name = "petition-staging"
