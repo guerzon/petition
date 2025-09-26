@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Helmet } from 'react-helmet-async'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { petitionApi } from '@/services/api'
 import type { PetitionWithDetails, Signature } from '@/types/api'
 import SignPetitionModal from './SignPetitionModal'
+import { Share, Copy, Check } from 'lucide-react'
+import { SiFacebook, SiX, SiWhatsapp, SiTelegram } from '@icons-pack/react-simple-icons'
 
 export default function PetitionDetail() {
   const { slug } = useParams<{ slug: string }>()
@@ -15,6 +18,8 @@ export default function PetitionDetail() {
   const [error, setError] = useState<string>('')
   const [signed, setSigned] = useState(false)
   const [showSignForm, setShowSignForm] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
+  const [sharedPlatform, setSharedPlatform] = useState<string | null>(null)
 
   const fetchPetition = useCallback(async () => {
     try {
@@ -55,6 +60,37 @@ export default function PetitionDetail() {
     await fetchPetition()
   }
 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopiedLink(true)
+      setTimeout(() => setCopiedLink(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy link:', err)
+    }
+  }
+
+  const handleShare = (platform: string) => {
+    const url = encodeURIComponent(window.location.href)
+    const title = encodeURIComponent(petition?.title || '')
+
+    const shareUrls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      twitter: `https://twitter.com/intent/tweet?url=${url}&text=${title}&hashtags=petition,philippines`,
+      whatsapp: `https://wa.me/?text=${title}%20${url}`,
+      telegram: `https://t.me/share/url?url=${url}&text=${title}`,
+    }
+
+    if (shareUrls[platform as keyof typeof shareUrls]) {
+      // Show visual feedback
+      setSharedPlatform(platform)
+      setTimeout(() => setSharedPlatform(null), 1000)
+
+      // Open sharing window
+      window.open(shareUrls[platform as keyof typeof shareUrls], '_blank', 'width=600,height=400')
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-8">
@@ -92,9 +128,67 @@ export default function PetitionDetail() {
   const progressPercentage = Math.round((petition.current_count / petition.target_count) * 100)
   const daysLeft = calculateDaysLeft(petition.created_at)
 
+  const petitionUrl = `${window.location.origin}/petitions/${petition.slug}`
+  const pageTitle = `${petition.title} | Philippine Petition Platform`
+  const pageDescription = petition.description.slice(0, 160) + (petition.description.length > 160 ? '...' : '')
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <>
+      <Helmet>
+        {/* Basic SEO */}
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <link rel="canonical" href={petitionUrl} />
+
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={petitionUrl} />
+        <meta property="og:title" content={petition.title} />
+        <meta property="og:description" content={pageDescription} />
+        {petition.image_url && <meta property="og:image" content={petition.image_url} />}
+        <meta property="og:site_name" content="Philippine Petition Platform" />
+        <meta property="og:locale" content="en_PH" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:url" content={petitionUrl} />
+        <meta name="twitter:title" content={petition.title} />
+        <meta name="twitter:description" content={pageDescription} />
+        {petition.image_url && <meta name="twitter:image" content={petition.image_url} />}
+
+        {/* Additional SEO */}
+        <meta name="keywords" content={`petition, philippines, ${petition.categories.map(c => c.name.toLowerCase()).join(', ')}, ${petition.type}`} />
+        <meta name="author" content={petition.creator.name || 'Philippine Petition Platform'} />
+        <meta name="robots" content="index, follow" />
+
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Petition",
+            "name": petition.title,
+            "description": pageDescription,
+            "url": petitionUrl,
+            "image": petition.image_url,
+            "author": {
+              "@type": "Person",
+              "name": petition.creator.name || "Anonymous"
+            },
+            "dateCreated": petition.created_at,
+            "targetCollection": petition.target_count,
+            "signatureCount": petition.current_count,
+            "location": petition.location,
+            "category": petition.categories.map(c => c.name).join(", "),
+            "publisher": {
+              "@type": "Organization",
+              "name": "Philippine Petition Platform"
+            }
+          })}
+        </script>
+      </Helmet>
+
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Breadcrumb */}
         <nav className="mb-6">
           <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -139,9 +233,7 @@ export default function PetitionDetail() {
                 <div className="flex items-center gap-4 text-sm text-gray-600">
                   <span>
                     Started by{' '}
-                    {petition.creator.anonymous
-                      ? 'Anonymous'
-                      : `${petition.creator.first_name} ${petition.creator.last_name}`}
+                    {petition.creator.name || 'Anonymous'}
                   </span>
                   <span>•</span>
                   <span>{new Date(petition.created_at).toLocaleDateString()}</span>
@@ -260,13 +352,96 @@ export default function PetitionDetail() {
               )}
 
               {/* Share buttons */}
-              <div className="space-y-2">
-                <Button variant="outline" className="w-full" size="sm">
-                  Share on Social Media
-                </Button>
-                <Button variant="outline" className="w-full" size="sm">
-                  Copy Link
-                </Button>
+              <div className="space-y-4">
+                <div className="border-t pt-4">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 mb-4">
+                    <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                      <Share className="h-5 w-5 text-blue-600" />
+                      Share this petition
+                    </h3>
+                    <p className="text-sm text-gray-600">Help spread the word and get more supporters</p>
+                  </div>
+
+                  {/* Social Media Share Buttons */}
+                  <div className="grid grid-cols-2 gap-3 mb-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShare('facebook')}
+                      className={`flex items-center justify-center gap-2 h-11 rounded-xl border-2 transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:border-blue-400 hover:text-blue-700 font-medium ${
+                        sharedPlatform === 'facebook' ? 'scale-105 shadow-md bg-gradient-to-r from-blue-50 to-blue-100 border-blue-400 text-blue-700' : ''
+                      }`}
+                    >
+                      <SiFacebook className="h-5 w-5 text-blue-600" />
+                      <span className="hidden sm:inline">
+                        {sharedPlatform === 'facebook' ? 'Shared!' : 'Facebook'}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShare('twitter')}
+                      className={`flex items-center justify-center gap-2 h-11 rounded-xl border-2 transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-gradient-to-r hover:from-sky-50 hover:to-sky-100 hover:border-sky-400 hover:text-sky-700 font-medium ${
+                        sharedPlatform === 'twitter' ? 'scale-105 shadow-md bg-gradient-to-r from-sky-50 to-sky-100 border-sky-400 text-sky-700' : ''
+                      }`}
+                    >
+                      <SiX className="h-5 w-5 text-sky-500" />
+                      <span className="hidden sm:inline">
+                        {sharedPlatform === 'twitter' ? 'Shared!' : 'Twitter'}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShare('whatsapp')}
+                      className={`flex items-center justify-center gap-2 h-11 rounded-xl border-2 transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:border-green-400 hover:text-green-700 font-medium ${
+                        sharedPlatform === 'whatsapp' ? 'scale-105 shadow-md bg-gradient-to-r from-green-50 to-green-100 border-green-400 text-green-700' : ''
+                      }`}
+                    >
+                      <SiWhatsapp className="h-5 w-5 text-green-600" />
+                      <span className="hidden sm:inline">
+                        {sharedPlatform === 'whatsapp' ? 'Shared!' : 'WhatsApp'}
+                      </span>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShare('telegram')}
+                      className={`flex items-center justify-center gap-2 h-11 rounded-xl border-2 transition-all duration-200 hover:scale-105 hover:shadow-md hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-100 hover:border-indigo-400 hover:text-indigo-700 font-medium ${
+                        sharedPlatform === 'telegram' ? 'scale-105 shadow-md bg-gradient-to-r from-blue-50 to-indigo-100 border-indigo-400 text-indigo-700' : ''
+                      }`}
+                    >
+                      <SiTelegram className="h-5 w-5 text-indigo-500" />
+                      <span className="hidden sm:inline">
+                        {sharedPlatform === 'telegram' ? 'Shared!' : 'Telegram'}
+                      </span>
+                    </Button>
+                  </div>
+
+                  {/* Copy Link Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyLink}
+                    className={`w-full flex items-center justify-center gap-2 h-12 rounded-xl border-2 transition-all duration-200 font-medium ${
+                      copiedLink
+                        ? 'bg-gradient-to-r from-green-50 to-emerald-100 border-green-400 text-green-700 shadow-md scale-105'
+                        : 'hover:scale-105 hover:shadow-md hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-100 hover:border-gray-400'
+                    }`}
+                  >
+                    {copiedLink ? (
+                      <>
+                        <Check className="h-5 w-5 text-green-600" />
+                        <span>Link Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-5 w-5" />
+                        <span>Copy Link</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -278,7 +453,8 @@ export default function PetitionDetail() {
           onClose={() => setShowSignForm(false)}
           onSuccess={handleSignSuccess}
         />
+        </div>
       </div>
-    </div>
+    </>
   )
 }
