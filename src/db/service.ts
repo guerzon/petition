@@ -370,13 +370,9 @@ export class DatabaseService {
       throw new Error('Failed to create signature')
     }
 
-    // Update the cached current_count in the petitions table
-    const updateCountStmt = this.db.prepare(`
-      UPDATE petitions 
-      SET current_count = current_count + 1 
-      WHERE id = ?
-    `)
-    await updateCountStmt.bind(signatureData.petition_id).run()
+    // Note: The current_count is automatically updated by the database trigger
+    // defined in consolidated_setup.sql (update_petition_count_on_insert)
+    // No manual count update needed here
 
     return result
   }
