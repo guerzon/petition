@@ -210,6 +210,12 @@ export async function getCachedData<T>(
   kv: KVNamespace
 ): Promise<T | null> {
   try {
+    console.log(`🔍 Checking KV for key: ${cacheKey}`)
+    if (!kv) {
+      console.error(`🚨 KV namespace is undefined for key: ${cacheKey}`)
+      return null
+    }
+    
     const cached = await kv.get(cacheKey, 'json')
     if (cached !== null) {
       console.log(`🎯 Cache HIT for key: ${cacheKey}`)
@@ -220,6 +226,9 @@ export async function getCachedData<T>(
     }
   } catch (error) {
     console.error(`🚨 KV Cache get error for key ${cacheKey}:`, error)
+    if (error instanceof Error) {
+      console.error(`🚨 Error details:`, error.message, error.stack)
+    }
     return null
   }
 }
@@ -231,12 +240,26 @@ export async function setCachedData<T>(
   ttlSeconds: number = 300 // 5 minutes default
 ): Promise<void> {
   try {
-    await kv.put(cacheKey, JSON.stringify(data), {
+    console.log(`🔄 Attempting to serialize data for key: ${cacheKey}`)
+    const serializedData = JSON.stringify(data)
+    const dataSize = new Blob([serializedData]).size
+    console.log(`📏 Data size: ${dataSize} bytes for key: ${cacheKey}`)
+    
+    if (dataSize > 25 * 1024 * 1024) { // 25MB limit
+      console.warn(`⚠️ Data too large for KV storage: ${dataSize} bytes for key: ${cacheKey}`)
+      return
+    }
+    
+    console.log(`🔄 Putting data in KV for key: ${cacheKey}`)
+    await kv.put(cacheKey, serializedData, {
       expirationTtl: ttlSeconds,
     })
-    console.log(`💾 Cache SET for key: ${cacheKey} (TTL: ${ttlSeconds}s)`)
+    console.log(`💾 Cache SET for key: ${cacheKey} (TTL: ${ttlSeconds}s, Size: ${dataSize} bytes)`)
   } catch (error) {
     console.error(`🚨 KV Cache set error for key ${cacheKey}:`, error)
+    if (error instanceof Error) {
+      console.error(`🚨 Error details:`, error.message, error.stack)
+    }
     // Don't throw - caching failures shouldn't break the API
   }
 }
@@ -288,8 +311,14 @@ export async function getOrSetCache<T>(
   const fetchTime = Date.now() - startTime
   console.log(`📊 Database query completed in ${fetchTime}ms for key: ${cacheKey}`)
   
-  // Store in cache for next time (don't await to avoid blocking the response)
-  setCachedData(cacheKey, data, kv, ttlSeconds)
+  // Store in cache for next time (temporarily await to debug issues)
+  console.log(`🔄 Attempting to cache data for key: ${cacheKey}`)
+  try {
+    await setCachedData(cacheKey, data, kv, ttlSeconds)
+    console.log(`✅ Successfully cached data for key: ${cacheKey}`)
+  } catch (error) {
+    console.error(`❌ Failed to cache data for key ${cacheKey}:`, error)
+  }
   
   return data
 }
