@@ -23,9 +23,13 @@ interface CreatePetitionFormData {
 
 export default function CreatePetition() {
   const navigate = useNavigate()
-  const { session, status, signIn }: {
-    session: Session | null;
-    status: 'loading' | 'authenticated' | 'unauthenticated';
+  const {
+    session,
+    status,
+    signIn,
+  }: {
+    session: Session | null
+    status: 'loading' | 'authenticated' | 'unauthenticated'
     signIn: (provider: 'google' | 'facebook') => Promise<void>
   } = useAuth()
   const { t } = useTranslation('common')
@@ -179,7 +183,7 @@ export default function CreatePetition() {
     }
 
     const reader = new FileReader()
-    reader.onload = (event) => {
+    reader.onload = event => {
       const base64String = event.target?.result as string
       handleInputChange('imageUrl', base64String)
       handleInputChange('imageFile', file)
@@ -241,7 +245,6 @@ export default function CreatePetition() {
     }
   }
 
-
   if (isLoading || status === 'loading') {
     return (
       <div className="min-h-screen bg-gray-50 py-8 flex items-center justify-center">
@@ -262,36 +265,57 @@ export default function CreatePetition() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">{t('create.title')}</h1>
-            <p className="text-lg text-gray-600 mb-8">
-              {t('create.subtitle')}
-            </p>
+            <p className="text-lg text-gray-600 mb-8">{t('create.subtitle')}</p>
 
             <Card className="max-w-md mx-auto p-8">
               <div className="text-center space-y-6">
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto">
-                  <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  <svg
+                    className="w-8 h-8 text-blue-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    />
                   </svg>
                 </div>
 
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('create.signInRequired')}</h2>
-                  <p className="text-gray-600 text-sm">
-                    {t('create.signInSubtitle')}
-                  </p>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                    {t('create.signInRequired')}
+                  </h2>
+                  <p className="text-gray-600 text-sm">{t('create.signInSubtitle')}</p>
                 </div>
 
                 <div className="space-y-3">
                   <Button
                     onClick={() => signIn('google')}
                     disabled={isSubmitting}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-3 h-12"
+                    variant="outline"
+                    className="w-full flex items-center justify-center gap-3 h-12"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                      <path
+                        fill="currentColor"
+                        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                      />
+                      <path
+                        fill="currentColor"
+                        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                      />
                     </svg>
                     {t('create.signInWithGoogle')}
                   </Button>
@@ -302,7 +326,7 @@ export default function CreatePetition() {
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-3 h-12"
                   >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                     </svg>
                     {t('create.signInWithFacebook')}
                   </Button>
@@ -330,9 +354,7 @@ export default function CreatePetition() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('create.title')}</h1>
-          <p className="mt-2 text-lg text-gray-600">
-            {t('create.subtitle')}
-          </p>
+          <p className="mt-2 text-lg text-gray-600">{t('create.subtitle')}</p>
         </div>
 
         <Card className="p-8">
@@ -373,9 +395,7 @@ export default function CreatePetition() {
                         {t('create.local')}
                       </label>
                     </div>
-                    <p className="mt-2 text-sm text-gray-600">
-                      {t('create.localDescription')}
-                    </p>
+                    <p className="mt-2 text-sm text-gray-600">{t('create.localDescription')}</p>
                   </div>
                 </Card>
 
@@ -401,9 +421,7 @@ export default function CreatePetition() {
                         {t('create.national')}
                       </label>
                     </div>
-                    <p className="mt-2 text-sm text-gray-600">
-                      {t('create.nationalDescription')}
-                    </p>
+                    <p className="mt-2 text-sm text-gray-600">{t('create.nationalDescription')}</p>
                   </div>
                 </Card>
               </div>
@@ -459,12 +477,15 @@ export default function CreatePetition() {
                 {t('create.petitionDescription')} *
               </label>
               <p className="text-sm text-gray-500 mb-4">
-                Explain the issue, why it matters, and what action you want taken. You can use markdown formatting for better presentation.
+                Explain the issue, why it matters, and what action you want taken. You can use
+                markdown formatting for better presentation.
               </p>
-              <div className={`rounded-md overflow-hidden ${errors.description ? 'ring-2 ring-red-500' : ''}`}>
+              <div
+                className={`rounded-md overflow-hidden ${errors.description ? 'ring-2 ring-red-500' : ''}`}
+              >
                 <MDEditor
                   value={formData.description}
-                  onChange={(value) => handleInputChange('description', value || '')}
+                  onChange={value => handleInputChange('description', value || '')}
                   preview="edit"
                   hideToolbar={false}
                   visibleDragbar={false}
@@ -477,7 +498,9 @@ export default function CreatePetition() {
               </div>
               <div className="flex justify-between items-center mt-2">
                 {errors.description && <p className="text-sm text-red-600">{errors.description}</p>}
-                <p className="text-xs text-gray-500 ml-auto">{formData.description.length} characters</p>
+                <p className="text-xs text-gray-500 ml-auto">
+                  {formData.description.length} characters
+                </p>
               </div>
 
               <div className="mt-2 text-xs text-gray-500">
@@ -502,7 +525,10 @@ export default function CreatePetition() {
 
               <div className="flex flex-col space-y-4">
                 <div className="flex items-center justify-center w-full">
-                  <label htmlFor="image-upload" className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400">
+                  <label
+                    htmlFor="image-upload"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400"
+                  >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       {formData.imageUrl ? (
                         <div className="text-center">
@@ -511,11 +537,22 @@ export default function CreatePetition() {
                         </div>
                       ) : (
                         <>
-                          <svg className="w-8 h-8 mb-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          <svg
+                            className="w-8 h-8 mb-2 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                            />
                           </svg>
                           <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">{t('create.chooseImage')}</span> or drag and drop
+                            <span className="font-semibold">{t('create.chooseImage')}</span> or drag
+                            and drop
                           </p>
                           <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
                         </>
@@ -546,8 +583,18 @@ export default function CreatePetition() {
                       }}
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -591,7 +638,7 @@ export default function CreatePetition() {
               {/* Category Dropdown */}
               <div className="relative">
                 <select
-                  onChange={(e) => {
+                  onChange={e => {
                     const categoryId = parseInt(e.target.value)
                     if (categoryId && !formData.categories.includes(categoryId)) {
                       handleCategoryToggle(categoryId)
@@ -607,8 +654,7 @@ export default function CreatePetition() {
                       <option key={category.id} value={category.id}>
                         {category.name}
                       </option>
-                    ))
-                  }
+                    ))}
                 </select>
               </div>
 
@@ -631,8 +677,18 @@ export default function CreatePetition() {
                             onClick={() => handleCategoryToggle(categoryId)}
                             className="ml-1 hover:bg-gray-300 rounded-full p-0.5"
                           >
-                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            <svg
+                              className="w-3 h-3"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M6 18L18 6M6 6l12 12"
+                              />
                             </svg>
                           </button>
                         </Badge>

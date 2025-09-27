@@ -10,6 +10,7 @@ import EditPetition from './components/EditPetition'
 import Footer from './components/layout/Footer'
 import SignInPage from './components/auth/SignInPage'
 import AuthErrorPage from './components/auth/AuthErrorPage'
+import ScrollToTop from './components/ScrollToTop'
 import { AuthProvider } from './hooks/useAuth'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
@@ -17,6 +18,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <div className="min-h-screen bg-gray-50">
           <Navbar />
           <main>
