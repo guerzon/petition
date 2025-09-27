@@ -239,8 +239,10 @@ export const signatureApi = {
     return result
   },
 
-  async getUserSignatures(userId: string): Promise<Signature[]> {
-    return apiRequest<Signature[]>(`/api/users/${encodeURIComponent(userId)}/signatures`)
+  async getUserSignatures(): Promise<Signature[]> {
+    // This endpoint actually returns petition IDs, not full signatures
+    // We need a different endpoint for full signature data
+    throw new Error('getUserSignatures not implemented - use getUserSignedPetitionIds instead')
   },
 
   async getUserSignedPetitionIds(userId: string): Promise<number[]> {

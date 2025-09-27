@@ -47,7 +47,7 @@ npm install
 npm install -g wrangler
 ```
 
-#### Login to Cloudflare
+#### Login to Cloudflare (optional)
 
 ```bash
 wrangler login
@@ -62,7 +62,7 @@ npm run db:setup
 # This will output a database ID - copy it to wrangler.toml
 ```
 
-#### Or manually update wrangler.toml
+#### Or manually update wrangler.toml (optional)
 
 Replace the `database_id` in `wrangler.toml` with your new database ID:
 
@@ -71,19 +71,6 @@ Replace the `database_id` in `wrangler.toml` with your new database ID:
 binding = "DB"
 database_name = "petition-db"
 database_id = "your-database-id-here"  # Replace with actual ID
-```
-
-#### Run Database Migrations
-
-```bash
-# Run initial migration (creates tables)
-npm run db:migrate
-
-# Run second migration (adds due_date and slug)
-npm run db:migrate:002
-
-# Seed with sample data
-npm run db:seed
 ```
 
 #### Verify Local Database Setup
@@ -109,12 +96,14 @@ The app will be available at `http://localhost:5173`
 The application uses the following main tables:
 
 ### Users
+
 - `id` (Primary Key)
 - `first_name`, `last_name`, `email`
 - `anonymous` (Boolean)
 - Timestamps
 
 ### Petitions
+
 - `id` (Primary Key)
 - `title`, `description`, `slug`
 - `type` ('local' | 'national')
@@ -125,16 +114,19 @@ The application uses the following main tables:
 - Timestamps
 
 ### Signatures
+
 - `petition_id`, `user_id` (Composite key)
 - `comment`, `anonymous`, `ip_address`
 - Unique constraint prevents duplicate signatures
 
 ### Categories & Petition_Categories
+
 - Category system with many-to-many relationship
 
 ## 🎯 Available Scripts
 
 ### Development
+
 ```bash
 npm run dev          # Start development server
 npm run build        # Build for production
@@ -142,14 +134,14 @@ npm run preview      # Preview production build
 ```
 
 ### Database
+
 ```bash
 npm run db:create    # Create new D1 database
-npm run db:migrate   # Run initial migration
-npm run db:migrate:002 # Run second migration
-npm run db:seed      # Seed with sample data
+npm run db:setup      # Setup and seed database
 ```
 
 ### Code Quality
+
 ```bash
 npm run lint         # Run ESLint
 npm run lint:fix     # Fix ESLint errors
@@ -158,6 +150,7 @@ npm run format:check # Check formatting
 ```
 
 ### Testing
+
 ```bash
 npm run test:e2e     # Run E2E tests
 npm run test:e2e:ui  # Run E2E tests with UI
@@ -231,6 +224,7 @@ wrangler d1 export petition-db --local --output backup.sql
 ### Deploy to Cloudflare Pages
 
 1. **Create Production Database**:
+
    ```bash
    wrangler d1 create petition-db-prod
    ```
@@ -238,6 +232,7 @@ wrangler d1 export petition-db --local --output backup.sql
 2. **Update wrangler.toml** with production database ID
 
 3. **Run Production Migrations**:
+
    ```bash
    wrangler d1 execute petition-db-prod --file=./src/db/migrations/001_create_tables.sql
    wrangler d1 execute petition-db-prod --file=./src/db/migrations/002_add_due_date_and_slug.sql
@@ -245,6 +240,7 @@ wrangler d1 export petition-db --local --output backup.sql
    ```
 
 4. **Deploy**:
+
    ```bash
    npm run build
    wrangler pages deploy dist
@@ -255,6 +251,7 @@ wrangler d1 export petition-db --local --output backup.sql
 The project includes comprehensive E2E tests using Playwright:
 
 ### Test Coverage
+
 - ✅ Petition browsing and listing
 - ✅ Petition detail pages
 - ✅ Petition creation (all form features)
@@ -309,6 +306,7 @@ petition/
 ## 🎨 Key Components
 
 ### CreatePetition
+
 - Card-based petition type selection
 - Markdown editor for rich descriptions
 - Base64 image upload
@@ -316,12 +314,14 @@ petition/
 - Form validation
 
 ### PetitionDetail
+
 - Progress tracking visualization
 - Recent signatures list
 - Share functionality
 - Sign petition modal
 
 ### SignPetitionModal
+
 - Form validation
 - Anonymous signing option
 - Comment support
@@ -353,6 +353,7 @@ The application uses Cloudflare Pages Functions for API routes:
 ### Common Issues
 
 **Database not found**:
+
 ```bash
 # Recreate local database
 wrangler d1 create petition-db --local
@@ -361,6 +362,7 @@ npm run db:migrate && npm run db:migrate:002 && npm run db:seed
 ```
 
 **Wrangler not found**:
+
 ```bash
 # Install globally
 npm install -g wrangler
@@ -369,6 +371,7 @@ npx wrangler login
 ```
 
 **Build errors**:
+
 ```bash
 # Clean install
 rm -rf node_modules package-lock.json
@@ -376,6 +379,7 @@ npm install
 ```
 
 **Tests failing**:
+
 ```bash
 # Install Playwright browsers
 npx playwright install
@@ -386,12 +390,14 @@ npm run dev
 ### Database Issues
 
 **Reset local database completely**:
+
 ```bash
 rm -rf .wrangler/state/d1/
 npm run db:migrate && npm run db:migrate:002 && npm run db:seed
 ```
 
 **Check database file location**:
+
 ```bash
 ls -la .wrangler/state/d1/
 ```

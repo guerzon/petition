@@ -70,7 +70,7 @@ const Footer: React.FC = () => {
               />
 
               <div>
-                <div className="font-bold">Petition by BetterGov.ph</div>
+                <div className="font-bold">Petitions by BetterGov.ph</div>
                 <div className="text-xs text-gray-400">A community-led initiative</div>
               </div>
             </div>
@@ -124,7 +124,7 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
-              Copyright © {new Date().getFullYear()} BetterGov.ph. All rights reserved.
+              {new Date().getFullYear()} BetterGov.ph.
             </p>
             <div className="flex space-x-6">
               <Link
