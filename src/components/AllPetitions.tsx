@@ -109,7 +109,7 @@ export default function AllPetitions() {
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">All Petitions</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Active Petitions</h1>
             <p className="text-lg text-gray-600 mb-6">
               Browse and support petitions that matter to you
             </p>
@@ -237,17 +237,29 @@ export default function AllPetitions() {
                         {isAuthenticated && hasSignedPetition(petition.id) ? (
                           <div className="flex items-center justify-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200 mb-3">
                             <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
-                              <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              <svg
+                                className="w-2.5 h-2.5 text-white"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                                  clipRule="evenodd"
+                                />
                               </svg>
                             </div>
-                            <span className="text-sm font-medium text-green-800">You signed this</span>
+                            <span className="text-sm font-medium text-green-800">
+                              You signed this
+                            </span>
                           </div>
                         ) : null}
 
                         <Link to={`/petition/${petition.slug}`}>
                           <Button className="w-full">
-                            {isAuthenticated && hasSignedPetition(petition.id) ? 'View Petition' : 'View & Sign Petition'}
+                            {isAuthenticated && hasSignedPetition(petition.id)
+                              ? 'View Petition'
+                              : 'View & Sign Petition'}
                           </Button>
                         </Link>
                       </CardContent>

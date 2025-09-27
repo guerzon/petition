@@ -169,7 +169,7 @@ export default function PetitionDetail() {
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+              <div className="bg-white rounded-sm shadow-sm p-6 mb-6">
                 {/* Header */}
                 <div className="mb-6">
                   <div className="flex flex-wrap gap-2 mb-4">
@@ -232,7 +232,7 @@ export default function PetitionDetail() {
               </div>
 
               {/* Recent Signatures */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="bg-white rounded-sm shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">
                   Recent Signatures ({petition.current_count.toLocaleString()})
                 </h2>
@@ -246,7 +246,7 @@ export default function PetitionDetail() {
                       </div>
                     ))}
                   </div>
-                ) : signatures.length === 0 ? (
+                ) : petition.current_count === 0 ? (
                   <p className="text-gray-600">No signatures yet. Be the first to sign!</p>
                 ) : (
                   <div className="space-y-4">
@@ -274,7 +274,7 @@ export default function PetitionDetail() {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+              <div className="bg-white rounded-sm shadow-sm p-6 sticky top-8">
                 {/* Progress */}
                 <div className="mb-6">
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
@@ -298,7 +298,11 @@ export default function PetitionDetail() {
                     <div className="flex items-center justify-center gap-2 mb-2">
                       <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
                         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                       </div>
                       <p className="text-green-800 font-medium">Thank you for signing!</p>

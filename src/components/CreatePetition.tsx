@@ -231,8 +231,8 @@ export default function CreatePetition() {
 
       const petition = await petitionApi.create(petitionData)
 
-      // Navigate to petition detail page or success page
-      navigate(`/?created=${petition.id}`)
+      // Navigate to review and publish page
+      navigate(`/review/${petition.slug}`)
     } catch (error) {
       console.error('Error creating petition:', error)
       if (error instanceof ApiError) {

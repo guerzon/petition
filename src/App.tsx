@@ -1,6 +1,7 @@
 import Navbar from './components/layout/Navbar'
 import HomePage from './components/HomePage'
 import CreatePetition from './components/CreatePetition'
+import ReviewPetition from './components/ReviewPetition'
 import AllPetitions from './components/AllPetitions'
 import FeaturedPetitions from './components/FeaturedPetitions'
 import PetitionDetail from './components/PetitionDetail'
@@ -30,13 +31,12 @@ function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/create" element={<CreatePetition />} />
+              <Route path="/review/:id" element={<ReviewPetition />} />
               <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/petition/:slug" element={<PetitionDetail />} />
               <Route path="/petition/:slug/edit" element={<EditPetition />} />
               <Route path="/proposals/:slug" element={<PetitionDetail />} />
-              <Route path="/how-it-works" element={<HowItWorks />} />
               <Route path="/profile" element={<UserProfile />} />
-              <Route path="/petition/:slug/edit" element={<EditPetition />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/petitions" element={<AllPetitions />} />
