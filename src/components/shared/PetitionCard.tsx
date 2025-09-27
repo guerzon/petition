@@ -13,7 +13,6 @@ interface PetitionCardProps {
 
 export default function PetitionCard({ 
   petition, 
-  showSignedStatus = false, 
   showTypeBadge = false 
 }: PetitionCardProps) {
   const { hasSignedPetition, isAuthenticated } = useUserSignatures()
