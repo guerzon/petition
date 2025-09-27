@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import PetitionCard from './shared/PetitionCard'
 import { petitionApi } from '@/services/api'
 import type { PetitionWithDetails } from '@/types/api'
 
@@ -172,58 +173,13 @@ export default function FeaturedPetitions() {
 
             {/* Other featured petitions */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {petitions.slice(1).map((petition, index) => {
-                const progressPercentage = Math.round((petition.current_count / petition.target_count) * 100)
-                const daysLeft = calculateDaysLeft(petition.created_at)
-                const primaryCategory = petition.categories[0]?.name || 'General'
-
-                return (
-                  <Card key={petition.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex gap-1 flex-wrap">
-                          <Badge variant="secondary">{primaryCategory}</Badge>
-                          <Badge variant={petition.type === 'local' ? 'outline' : 'default'}>
-                            {petition.type}
-                          </Badge>
-                          {index < 5 && <Badge className="bg-orange-500 text-xs">Top {index + 2}</Badge>}
-                        </div>
-                        <span className="text-sm text-gray-500">{daysLeft} days left</span>
-                      </div>
-                      <CardTitle className="text-xl font-semibold line-clamp-2">
-                        <Link to={`/petition/${petition.slug}`} className="hover:text-blue-600 transition-colors">
-                          {petition.title}
-                        </Link>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-gray-800 mb-4 line-clamp-3">{petition.description}</p>
-
-                      {petition.type === 'local' && petition.location && (
-                        <p className="text-sm text-blue-600 mb-2">📍 {petition.location}</p>
-                      )}
-
-                      <div className="mb-4">
-                        <div className="flex justify-between text-sm text-gray-600 mb-1">
-                          <span>{petition.current_count.toLocaleString()} signatures</span>
-                          <span>{petition.target_count.toLocaleString()} target</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div
-                            className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                          />
-                        </div>
-                        <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
-                      </div>
-
-                      <Link to={`/petition/${petition.slug}`}>
-                        <Button className="w-full">View & Sign Petition</Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
-                )
-              })}
+              {petitions.slice(1).map(petition => (
+                <PetitionCard 
+                  key={petition.id} 
+                  petition={petition} 
+                  showTypeBadge={true}
+                />
+              ))}
             </div>
 
             <div className="text-center mt-12">

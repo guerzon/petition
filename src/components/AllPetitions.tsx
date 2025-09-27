@@ -1,15 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import PetitionCard from './shared/PetitionCard'
 import { petitionApi } from '@/services/api'
-import { useUserSignatures } from '@/hooks/useUserSignatures'
 import type { PetitionWithDetails } from '@/types/api'
 
 export default function AllPetitions() {
-  const { hasSignedPetition, isAuthenticated } = useUserSignatures()
   const [petitions, setPetitions] = useState<PetitionWithDetails[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
@@ -63,12 +61,6 @@ export default function AllPetitions() {
     fetchPetitions(false)
   }
 
-  const calculateDaysLeft = (createdAt: string): number => {
-    const created = new Date(createdAt)
-    const now = new Date()
-    const daysSinceCreated = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24))
-    return Math.max(0, 60 - daysSinceCreated)
-  }
 
   const filteredPetitions = petitions.filter(
     petition =>
@@ -187,86 +179,14 @@ export default function AllPetitions() {
           ) : (
             <>
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {filteredPetitions.map(petition => {
-                  const progressPercentage = Math.round(
-                    (petition.current_count / petition.target_count) * 100
-                  )
-                  const daysLeft = calculateDaysLeft(petition.created_at)
-                  const primaryCategory = petition.categories[0]?.name || 'General'
-
-                  return (
-                    <Card key={petition.id} className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex gap-1 flex-wrap">
-                            <Badge variant="secondary">{primaryCategory}</Badge>
-                            <Badge variant={petition.type === 'local' ? 'outline' : 'default'}>
-                              {petition.type}
-                            </Badge>
-                          </div>
-                          {isAuthenticated && hasSignedPetition(petition.id) ? (
-                            <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                              <svg
-                                className="w-3 h-3"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              <span className="text-xs font-medium">Signed</span>
-                            </div>
-                          ) : (
-                            <span className="text-sm text-gray-500">{daysLeft} days left</span>
-                          )}
-                        </div>
-                        <CardTitle className="text-xl font-semibold line-clamp-2">
-                          <Link
-                            to={`/petition/${petition.slug}`}
-                            className="hover:text-blue-600 transition-colors"
-                          >
-                            {petition.title}
-                          </Link>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-gray-800 mb-4 line-clamp-3">{petition.description}</p>
-
-                        {petition.type === 'local' && petition.location && (
-                          <p className="text-sm text-blue-600 mb-2">📍 {petition.location}</p>
-                        )}
-
-                        <div className="mb-4">
-                          <div className="flex justify-between text-sm text-gray-600 mb-1">
-                            <span>{petition.current_count.toLocaleString()} signatures</span>
-                            <span>{petition.target_count.toLocaleString()} target</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
-                            <div
-                              className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${Math.min(progressPercentage, 100)}%` }}
-                            />
-                          </div>
-                          <div className="text-sm text-gray-500 mt-1">
-                            {progressPercentage}% complete
-                          </div>
-                        </div>
-
-
-                        <Link to={`/petition/${petition.slug}`}>
-                          <Button className="w-full">
-                            {isAuthenticated && hasSignedPetition(petition.id)
-                              ? 'View Petition'
-                              : 'View & Sign Petition'}
-                          </Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
+                {filteredPetitions.map(petition => (
+                  <PetitionCard 
+                    key={petition.id} 
+                    petition={petition} 
+                    showSignedStatus={true}
+                    showTypeBadge={true}
+                  />
+                ))}
               </div>
 
               {/* Load More Button */}
