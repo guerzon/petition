@@ -14,7 +14,11 @@ import { onRequest as categoriesHandler } from './api/categories'
 import { onRequest as authHandler } from './auth/[...auth]'
 import { getCorsHeaders, handleCORS } from './_shared/utils'
 
-function createContext(request: Request, env: Env, params: Record<string, string> = {}): EventContext<Env> {
+function createContext(
+  request: Request,
+  env: Env,
+  params: Record<string, string> = {}
+): EventContext<Env> {
   return {
     request,
     env,
@@ -29,7 +33,7 @@ function parsePathParams(path: string, pattern: string): Record<string, string> 
   const pathParts = path.split('/').filter(p => p)
   const patternParts = pattern.split('/').filter(p => p)
   const params: Record<string, string> = {}
-  
+
   for (let i = 0; i < patternParts.length; i++) {
     const part = patternParts[i]
     if (part.startsWith('[') && part.endsWith(']')) {
@@ -37,7 +41,7 @@ function parsePathParams(path: string, pattern: string): Record<string, string> 
       params[paramName] = pathParts[i] || ''
     }
   }
-  
+
   return params
 }
 
@@ -69,50 +73,49 @@ export default {
       if (path === '/api/test') {
         return await testHandler(createContext(request, env))
       }
-      
+
       if (path === '/api/users') {
         return await usersHandler(createContext(request, env))
       }
-      
+
       if (path.match(/^\/api\/users\/\d+$/)) {
         const params = parsePathParams(path, '/api/users/[id]')
         return await userByIdHandler(createContext(request, env, params))
       }
-      
+
       if (path === '/api/petitions') {
         return await petitionsHandler(createContext(request, env))
       }
-      
+
       if (path.match(/^\/api\/petition\/[^/]+$/)) {
         const params = parsePathParams(path, '/api/petition/[slug]')
         return await petitionBySlugHandler(createContext(request, env, params))
       }
-      
+
       if (path.match(/^\/api\/petitions\/\d+\/signatures$/)) {
         const params = parsePathParams(path, '/api/petitions/[id]/signatures')
         return await petitionSignaturesHandler(createContext(request, env, params))
       }
-      
+
       if (path.match(/^\/api\/petitions\/\d+$/)) {
         const params = parsePathParams(path, '/api/petitions/[id]')
         return await petitionByIdHandler(createContext(request, env, params))
       }
-      
+
       if (path === '/api/signatures') {
         return await signaturesHandler(createContext(request, env))
       }
-      
+
       if (path === '/api/categories') {
         return await categoriesHandler(createContext(request, env))
       }
 
       // 404 for unmatched routes
       const corsHeaders = getCorsHeaders(request, env)
-      return new Response('Not Found', { 
+      return new Response('Not Found', {
         status: 404,
-        headers: corsHeaders
+        headers: corsHeaders,
       })
-
     } catch (error: unknown) {
       console.error('Router Error:', error)
       const message = error instanceof Error ? error.message : 'Unknown error'
@@ -121,7 +124,7 @@ export default {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
-          ...corsHeaders
+          ...corsHeaders,
         },
       })
     }

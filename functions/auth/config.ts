@@ -61,7 +61,6 @@ export function createAuthConfig(env: Env): AuthConfig {
           session.user.id = user.id
           session.user.name = user.name
 
-          // obfuscate the email as we don't really need it.
           session.user.email = obfuscateEmail(user.email)
           session.user.image = user.image
         }
