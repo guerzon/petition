@@ -23,19 +23,21 @@ interface UserStats {
   petitionsCreated: number
   totalSignaturesReceived: number
   activePetitions: number
+  petitionsSigned: number
 }
 
 export default function UserProfile() {
   const { session, status } = useAuth()
   const { showSignInModal } = useModal()
-  const [userPetitions, setUserPetitions] = useState<Petition[]>([])
+  const [createdPetitions, setCreatedPetitions] = useState<Petition[]>([])
   const [userStats, setUserStats] = useState<UserStats>({
-    totalPetitions: 0,
+    petitionsCreated: 0,
     totalSignaturesReceived: 0,
     activePetitions: 0,
+    petitionsSigned: 0,
   })
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState<'overview' | 'created' | 'supported'>('overview')
 
   const loadUserData = useCallback(async () => {
     if (!session?.user?.id) return
@@ -56,10 +58,11 @@ export default function UserProfile() {
       setUserStats({
         petitionsCreated: created.length,
         petitionsSigned: 0, // Will be updated when supported petitions API is ready
-        totalSignaturesReceived
+        totalSignaturesReceived,
+        activePetitions: created.filter(p => p.status === 'active').length
       })
-    } catch (error) {
-      console.error('Failed to load user data:', error)
+    } catch (err) {
+      console.error('Failed to load user data:', err)
     } finally {
       setLoading(false)
     }
