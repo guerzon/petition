@@ -1,7 +1,10 @@
 name = "petition"
 main = "./functions/index.ts"
-compatibility_date = "2024-09-25"
+compatibility_date = "2025-04-23"
 compatibility_flags = ["nodejs_compat"]
+
+assets = { not_found_handling = "single-page-application" }
+
 # route = { pattern = "petition.ph/*", zone_name = "petition.ph" }
 
 [vars]
