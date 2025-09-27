@@ -17,18 +17,21 @@ export const footerNavigation = {
       title: 'Services',
       links: [
         { label: 'All Petitions', href: '/petitions' },
-        { label: 'Featured Petitions', href: '/petitions/featured' },
-        { label: 'My Petitions', href: '/petitions/my' },
+        { label: 'Featured Petitions', href: '/featured' },
+        // { label: 'My Petitions', href: '/petitions/my' },
       ],
     },
     {
-      title: 'Government',
-      links: [{ label: 'BetterGov.ph', href: 'https://bettergov.ph' }],
+      title: 'Our Projects',
+      links: [
+        { label: 'BetterGov.ph', href: 'https://bettergov.ph' },
+        { label: 'SALN Tracker', href: 'https://saln.bettergov.ph' },
+      ],
     },
   ],
   socialLinks: [
     { label: 'Facebook', href: 'https://facebook.com/bettergovph' },
-    { label: 'Discord', href: '/discord' },
+    { label: 'Discord', href: 'https://discord.gg/bettergovph' },
     // { label: 'Instagram', href: 'https://instagram.com/govph' },
     // { label: 'YouTube', href: 'https://youtube.com/govph' },
   ],
@@ -129,12 +132,6 @@ const Footer: React.FC = () => {
                 className="text-gray-400 hover:text-white text-sm transition-colors"
               >
                 Contribute at GitHub
-              </Link>
-              <Link
-                to="/sitemap"
-                className="text-gray-400 hover:text-white text-sm transition-colors"
-              >
-                Sitemap
               </Link>
             </div>
           </div>
