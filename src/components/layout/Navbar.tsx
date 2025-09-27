@@ -188,20 +188,21 @@ const Navbar: React.FC = () => {
         <div className="container mx-auto px-2 pt-2 pb-4 space-y-1 border-t border-gray-200 bg-white">
           {mainNavigation.map(item => (
             <div key={item.label}>
-              <button
-                onClick={() => toggleSubmenu(item.label)}
-                className="w-full flex justify-between items-center px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
+              <Link
+                to={item.href}
+                onClick={closeMenu}
+                className="cursor-pointer w-full flex justify-between items-center px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
               >
                 {t(`navbar.${item.label.toLowerCase()}`)}
-                {item.children && (
+                {item.children && item.children.length > 0 && (
                   <ChevronDown
                     className={`h-5 w-5 transition-transform ${
                       activeMenu === item.label ? 'transform rotate-180' : ''
                     }`}
                   />
                 )}
-              </button>
-              {item.children && activeMenu === item.label && (
+              </Link>
+              {item.children && item.children.length > 0 && activeMenu === item.label && (
                 <div className="pl-6 py-2 space-y-1 bg-gray-50">
                   {item.children.map(child => (
                     <Link
@@ -217,34 +218,6 @@ const Navbar: React.FC = () => {
               )}
             </div>
           ))}
-          <Link
-            to="/join-us"
-            onClick={closeMenu}
-            className="block px-4 py-2 text-base font-semibold text-primary-600 hover:bg-primary-50 hover:text-primary-700"
-          >
-            🚀 {t('navbar.join us')}
-          </Link>
-          <Link
-            to="/about"
-            onClick={closeMenu}
-            className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
-          >
-            {t('navbar.about')}
-          </Link>
-          <Link
-            to="/search"
-            onClick={closeMenu}
-            className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
-          >
-            {t('navbar.search')}
-          </Link>
-          <Link
-            to="/sitemap"
-            onClick={closeMenu}
-            className="block px-4 py-2 text-base font-medium text-gray-700 hover:bg-gray-50 hover:text-primary-500"
-          >
-            {t('navbar.sitemap')}
-          </Link>
 
           {status === 'authenticated' ? (
             <div className="px-4 py-3 border-t border-gray-200">

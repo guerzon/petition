@@ -8,41 +8,21 @@ export const footerNavigation = {
     {
       title: 'About',
       links: [
-        { label: 'About the Portal', href: '/about' },
-        { label: 'Project Ideas', href: '/ideas' },
-        { label: 'Accessibility', href: '/accessibility' },
+        { label: 'How It Works', href: '/how-it-works' },
         { label: 'Terms of Use', href: '/terms-of-service' },
-        { label: 'Contact Us', href: '/about' },
       ],
     },
     {
       title: 'Services',
       links: [
-        { label: 'All Services', href: '/services' },
-        { label: 'Service Directory', href: '/services' },
-        { label: 'Websites', href: '/services/websites' },
-        { label: 'Forex', href: '/data/forex' },
-        { label: 'Weather', href: '/data/weather' },
-        { label: 'Hotlines', href: '/philippines/hotlines' },
-        { label: 'Holidays', href: '/philippines/holidays' },
-        { label: 'Flood Control Projects', href: '/flood-control-projects' },
+        { label: 'All Petitions', href: '/petitions' },
+        { label: 'Featured Petitions', href: '/petitions/featured' },
+        { label: 'My Petitions', href: '/petitions/my' },
       ],
     },
     {
       title: 'Government',
-      links: [
-        { label: 'Official Gov.ph', href: 'https://gov.ph' },
-        { label: 'Open Data', href: 'https://data.gov.ph' },
-        { label: 'Freedom of Information', href: 'https://www.foi.gov.ph' },
-        {
-          label: 'Contact Center',
-          href: 'https://contactcenterngbayan.gov.ph',
-        },
-        {
-          label: 'Official Gazette',
-          href: 'https://www.officialgazette.gov.ph',
-        },
-      ],
+      links: [{ label: 'BetterGov.ph', href: 'https://bettergov.ph' }],
     },
   ],
   socialLinks: [
@@ -75,7 +55,7 @@ const Footer: React.FC = () => {
 
   return (
     <footer className="bg-gray-900 text-white">
-      <div className="container mx-auto px-4 pt-12 pb-8">
+      <div className="container mx-auto px-4 pt-12 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center mb-4">
@@ -86,8 +66,8 @@ const Footer: React.FC = () => {
               />
 
               <div>
-                <div className="font-bold">Better Philippines</div>
-                <div className="text-xs text-gray-400">BetterGov.ph Portal</div>
+                <div className="font-bold">Petition by BetterGov.ph</div>
+                <div className="text-xs text-gray-400">A community-led initiative</div>
               </div>
             </div>
             <p className="text-gray-400 text-sm mb-4">
