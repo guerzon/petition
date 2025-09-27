@@ -51,10 +51,6 @@ const Navbar: React.FC = () => {
     setActiveMenu(null)
   }
 
-  const toggleSubmenu = (label: string) => {
-    setActiveMenu(activeMenu === label ? null : label)
-  }
-
   const changeLanguage = (newLanguage: LanguageType) => {
     i18n.changeLanguage(newLanguage)
   }
