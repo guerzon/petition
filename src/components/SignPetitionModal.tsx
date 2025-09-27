@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/useAuth'
-import SignInModal from '@/components/auth/SignInModal'
+import { useModal } from '@/contexts/ModalContext'
 import { signatureApi, ApiError } from '@/services/api'
 import type { PetitionWithDetails } from '@/types/api'
 
@@ -26,13 +26,13 @@ export default function SignPetitionModal({
   onSuccess,
 }: SignPetitionModalProps) {
   const { session, status } = useAuth()
+  const { showSignInModal } = useModal()
   const [signForm, setSignForm] = useState<SignForm>({
     comment: '',
     anonymous: false,
   })
   const [signErrors, setSignErrors] = useState<Record<string, string>>({})
   const [signing, setSigning] = useState(false)
-  const [showSignIn, setShowSignIn] = useState(false)
 
   const validateSignForm = (): boolean => {
     const errors: Record<string, string> = {}
@@ -50,7 +50,10 @@ export default function SignPetitionModal({
 
     if (!validateSignForm()) {
       if (status !== 'authenticated') {
-        setShowSignIn(true)
+        showSignInModal({
+          title: 'Sign In to Sign Petition',
+          subtitle: 'Sign in to add your signature to this petition'
+        })
       }
       return
     }
@@ -88,10 +91,6 @@ export default function SignPetitionModal({
     }
   }
 
-  const handleSignInSuccess = () => {
-    setShowSignIn(false)
-    // The page will reload after successful sign-in, so this component will be re-rendered
-  }
 
   if (!isOpen) {
     return null
@@ -188,7 +187,10 @@ export default function SignPetitionModal({
               ) : (
                 <Button
                   type="button"
-                  onClick={() => setShowSignIn(true)}
+                  onClick={() => showSignInModal({
+                    title: 'Sign In to Sign Petition',
+                    subtitle: 'Sign in to add your signature to this petition'
+                  })}
                   disabled={status === 'loading'}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
@@ -200,14 +202,6 @@ export default function SignPetitionModal({
         </CardContent>
       </Card>
     </div>
-
-      <SignInModal
-        isOpen={showSignIn}
-        onClose={() => setShowSignIn(false)}
-        onSuccess={handleSignInSuccess}
-        title="Sign In to Sign Petition"
-        subtitle="Sign in to add your signature to this petition"
-      />
     </>
   )
 }

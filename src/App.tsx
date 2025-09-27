@@ -12,12 +12,14 @@ import SignInPage from './components/auth/SignInPage'
 import AuthErrorPage from './components/auth/AuthErrorPage'
 import ScrollToTop from './components/ScrollToTop'
 import { AuthProvider } from './hooks/useAuth'
+import { ModalProvider } from './contexts/ModalContext'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <ModalProvider>
+        <Router>
         <ScrollToTop />
         <div className="min-h-screen bg-gray-50">
           <Navbar />
@@ -38,7 +40,8 @@ function App() {
           </main>
           <Footer />
         </div>
-      </Router>
+        </Router>
+      </ModalProvider>
     </AuthProvider>
   )
 }

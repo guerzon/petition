@@ -1,4 +1,5 @@
 import { useSearchParams, Link } from 'react-router-dom'
+import { useModal } from '../../contexts/ModalContext'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { AlertTriangle, Home, LogIn } from 'lucide-react'
@@ -21,6 +22,7 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 export default function AuthErrorPage() {
   const [searchParams] = useSearchParams()
+  const { showSignInModal } = useModal()
   const error = searchParams.get('error') || 'Default'
 
   const errorMessage = ERROR_MESSAGES[error] || ERROR_MESSAGES.Default
@@ -73,13 +75,11 @@ export default function AuthErrorPage() {
               </Link>
             </Button>
             <Button
-              asChild
+              onClick={() => showSignInModal()}
               className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
             >
-              <Link to="/auth/signin">
-                <LogIn className="w-4 h-4 mr-2" />
-                Try Again
-              </Link>
+              <LogIn className="w-4 h-4 mr-2" />
+              Try Again
             </Button>
           </div>
         </CardContent>

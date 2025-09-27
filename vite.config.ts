@@ -32,5 +32,5 @@ export default defineConfig({
     },
   },
   // Configure dev server to handle client-side routing
-  appType: 'mpa',
+  appType: 'spa',
 })

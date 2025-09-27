@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LANGUAGES, type LanguageType } from '../../i18n/languages'
 import { useAuth } from '../../hooks/useAuth'
+import { useModal } from '../../contexts/ModalContext'
 import UserProfile from '../auth/UserProfile'
 
 const mainNavigation = [
@@ -38,6 +39,7 @@ const Navbar: React.FC = () => {
   const [activeMenu, setActiveMenu] = useState<string | null>(null)
   const { t, i18n } = useTranslation('common')
   const { status } = useAuth()
+  const { showSignInModal } = useModal()
 
   const toggleMenu = () => {
     setIsOpen(!isOpen)
@@ -153,12 +155,12 @@ const Navbar: React.FC = () => {
             {status === 'authenticated' ? (
               <UserProfile />
             ) : (
-              <Link
-                to="/auth/signin"
+              <button
+                onClick={() => showSignInModal()}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
               >
                 {t('navbar.signIn')}
-              </Link>
+              </button>
             )}
           </div>
 
@@ -221,13 +223,15 @@ const Navbar: React.FC = () => {
             </div>
           ) : (
             <div className="px-4 py-3 border-t border-gray-200">
-              <Link
-                to="/auth/signin"
-                onClick={closeMenu}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors block text-center"
+              <button
+                onClick={() => {
+                  showSignInModal()
+                  closeMenu()
+                }}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors block text-center w-full"
               >
                 {t('navbar.signIn')}
-              </Link>
+              </button>
             </div>
           )}
 

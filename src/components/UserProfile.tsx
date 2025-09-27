@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
+import { useModal } from '../contexts/ModalContext'
 import { useAuth } from '../hooks/useAuth'
 import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
@@ -20,20 +21,21 @@ import {
 
 interface UserStats {
   petitionsCreated: number
-  petitionsSigned: number
   totalSignaturesReceived: number
+  activePetitions: number
 }
 
 export default function UserProfile() {
   const { session, status } = useAuth()
-  const [activeTab, setActiveTab] = useState<'overview' | 'created' | 'supported'>('overview')
-  const [createdPetitions, setCreatedPetitions] = useState<Petition[]>([])
+  const { showSignInModal } = useModal()
+  const [userPetitions, setUserPetitions] = useState<Petition[]>([])
   const [userStats, setUserStats] = useState<UserStats>({
-    petitionsCreated: 0,
-    petitionsSigned: 0,
-    totalSignaturesReceived: 0
+    totalPetitions: 0,
+    totalSignaturesReceived: 0,
+    activePetitions: 0,
   })
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   const loadUserData = useCallback(async () => {
     if (!session?.user?.id) return
@@ -87,11 +89,12 @@ export default function UserProfile() {
           <Card className="max-w-md mx-auto p-8 text-center">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Sign In Required</h2>
             <p className="text-gray-600 mb-6">Please sign in to view your profile.</p>
-            <Link to="/auth/signin">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                Sign In
-              </Button>
-            </Link>
+            <Button 
+              onClick={() => showSignInModal()}
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+            >
+              Sign In
+            </Button>
           </Card>
         </div>
       </div>
