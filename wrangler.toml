@@ -27,5 +27,10 @@ database_name = "petition-db"
 # database_id = "4fd4c724-020d-4eed-b3e7-959c8f38a786"
 database_id = "c59456f6-7137-4c00-a3c7-e9c56ccd820e"
 
+[[kv_namespaces]]
+binding = "CACHE"
+id = "petition-cache"
+preview_id = "petition-cache-preview"
+
 [env.staging]
 name = "petition-staging"

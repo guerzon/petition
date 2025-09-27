@@ -5,7 +5,10 @@ import {
   createSuccessResponse, 
   createCachedResponse,
   createCachedErrorResponse,
-  getDbService 
+  getDbService,
+  generateCacheKey,
+  getOrSetCache,
+  invalidateCachePattern
 } from '../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
@@ -19,6 +22,11 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
     if (context.request.method === 'POST') {
       const petitionData: CreatePetitionInput = await context.request.json()
       const petition = await db.createPetition(petitionData)
+      
+      // Invalidate petition caches when a new petition is created
+      console.log(`🆕 New petition created - invalidating all petition caches`)
+      await invalidateCachePattern('petitions:', context.env.CACHE)
+      
       return createSuccessResponse(petition)
     }
 
@@ -28,17 +36,28 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
       const offset = parseInt(url.searchParams.get('offset') || '0')
       const userId = url.searchParams.get('userId')
 
+      // Generate cache key for this request
+      const cacheKey = generateCacheKey(context.request, 'petitions')
+
       // If userId is provided, get petitions for specific user
       if (userId) {
-        const petitions = await db.getUserPetitions(userId)
-        // Cache user petitions for 2 minutes (they change less frequently)
-        return createCachedResponse(petitions, context.request, context.env, 120)
+        const petitions = await getOrSetCache(
+          cacheKey,
+          context.env.CACHE,
+          () => db.getUserPetitions(userId),
+          5 * 60 // Cache for 5 minutes
+        )
+        return createCachedResponse(petitions, context.request, context.env, 5 * 60)
       }
 
       // Otherwise get all petitions
-      const petitions = await db.getAllPetitions(limit, offset, type)
-      // Cache all petitions for 5 minutes
-      return createCachedResponse(petitions, context.request, context.env, 300)
+      const petitions = await getOrSetCache(
+        cacheKey,
+        context.env.CACHE,
+        () => db.getAllPetitions(limit, offset, type),
+        5 * 60 // Cache for 5 minutes
+      )
+      return createCachedResponse(petitions, context.request, context.env, 5 * 60)
     }
 
     return createCachedErrorResponse('Method not allowed', context.request, context.env, 405)

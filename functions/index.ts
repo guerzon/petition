@@ -73,9 +73,6 @@ export default {
         return response
       }
 
-      if (path === '/api/test') {
-        return await testHandler(createContext(request, env))
-      }
 
       if (path === '/api/users') {
         return await usersHandler(createContext(request, env))

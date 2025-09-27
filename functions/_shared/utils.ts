@@ -183,3 +183,113 @@ export function createCachedErrorResponse(
     },
   })
 }
+
+// KV Cache utilities
+export function generateCacheKey(request: Request, prefix: string = 'api'): string {
+  const url = new URL(request.url)
+  const path = url.pathname
+  const searchParams = url.searchParams
+  
+  // Sort search params for consistent cache keys
+  const params: [string, string][] = []
+  searchParams.forEach((value, key) => {
+    params.push([key, value])
+  })
+  
+  const sortedParams = params
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&')
+  
+  const cacheKey = `${prefix}:${path}${sortedParams ? `?${sortedParams}` : ''}`
+  return cacheKey
+}
+
+export async function getCachedData<T>(
+  cacheKey: string,
+  kv: KVNamespace
+): Promise<T | null> {
+  try {
+    const cached = await kv.get(cacheKey, 'json')
+    if (cached !== null) {
+      console.log(`🎯 Cache HIT for key: ${cacheKey}`)
+      return cached as T | null
+    } else {
+      console.log(`❌ Cache MISS for key: ${cacheKey}`)
+      return null
+    }
+  } catch (error) {
+    console.error(`🚨 KV Cache get error for key ${cacheKey}:`, error)
+    return null
+  }
+}
+
+export async function setCachedData<T>(
+  cacheKey: string,
+  data: T,
+  kv: KVNamespace,
+  ttlSeconds: number = 300 // 5 minutes default
+): Promise<void> {
+  try {
+    await kv.put(cacheKey, JSON.stringify(data), {
+      expirationTtl: ttlSeconds,
+    })
+    console.log(`💾 Cache SET for key: ${cacheKey} (TTL: ${ttlSeconds}s)`)
+  } catch (error) {
+    console.error(`🚨 KV Cache set error for key ${cacheKey}:`, error)
+    // Don't throw - caching failures shouldn't break the API
+  }
+}
+
+export async function invalidateCachePattern(
+  pattern: string,
+  kv: KVNamespace
+): Promise<void> {
+  try {
+    // List keys matching the pattern
+    const keys = await kv.list({ prefix: pattern })
+    
+    if (keys.keys.length > 0) {
+      console.log(`🗑️ Cache INVALIDATE: Found ${keys.keys.length} keys matching pattern "${pattern}"`)
+      
+      // Delete all matching keys
+      const deletePromises = keys.keys.map(key => {
+        console.log(`🗑️ Deleting cache key: ${key.name}`)
+        return kv.delete(key.name)
+      })
+      await Promise.all(deletePromises)
+      
+      console.log(`✅ Cache INVALIDATE: Successfully deleted ${keys.keys.length} keys`)
+    } else {
+      console.log(`ℹ️ Cache INVALIDATE: No keys found matching pattern "${pattern}"`)
+    }
+  } catch (error) {
+    console.error(`🚨 KV Cache invalidation error for pattern ${pattern}:`, error)
+    // Don't throw - cache invalidation failures shouldn't break the API
+  }
+}
+
+export async function getOrSetCache<T>(
+  cacheKey: string,
+  kv: KVNamespace,
+  dataFetcher: () => Promise<T>,
+  ttlSeconds: number = 300
+): Promise<T> {
+  
+  // Try to get from cache first
+  const cached = await getCachedData<T>(cacheKey, kv)
+  if (cached !== null) {
+    return cached
+  }
+  
+  // If not in cache, fetch the data
+  const startTime = Date.now()
+  const data = await dataFetcher()
+  const fetchTime = Date.now() - startTime
+  console.log(`📊 Database query completed in ${fetchTime}ms for key: ${cacheKey}`)
+  
+  // Store in cache for next time (don't await to avoid blocking the response)
+  setCachedData(cacheKey, data, kv, ttlSeconds)
+  
+  return data
+}
