@@ -208,6 +208,18 @@ export const petitionApi = {
     
     return result
   },
+
+  async publish(id: number): Promise<Petition> {
+    const result = await apiRequest<Petition>(`/api/petitions/${id}/publish`, {
+      method: 'POST',
+    })
+    
+    // Invalidate related caches after publishing a petition
+    cacheUtils.invalidatePattern('GET:/api/petitions')
+    cacheUtils.delete(`GET:/api/petitions/${id}:`)
+    
+    return result
+  },
 }
 
 // Signature API

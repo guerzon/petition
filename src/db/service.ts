@@ -209,6 +209,7 @@ export class DatabaseService {
     type?: 'local' | 'national'
   ): Promise<PetitionWithDetails[]> {
     // Get petitions with creator info - no expensive JOIN with signatures
+    // Only return published petitions (where published_at is not NULL)
     let query = `
       SELECT 
         p.*,
@@ -217,11 +218,12 @@ export class DatabaseService {
         NULL as creator_anonymous
       FROM petitions p
       JOIN users u ON p.created_by = u.id
+      WHERE p.published_at IS NOT NULL
     `
 
     const params: (string | number)[] = []
     if (type) {
-      query += ' WHERE p.type = ?'
+      query += ' AND p.type = ?'
       params.push(type)
     }
 
@@ -273,10 +275,29 @@ export class DatabaseService {
     return result.results || []
   }
 
+  async publishPetition(id: number): Promise<Petition> {
+    const stmt = this.db.prepare(`
+      UPDATE petitions 
+      SET published_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `)
+    await stmt.bind(id).run()
+    
+    // Return the updated petition
+    const selectStmt = this.db.prepare('SELECT * FROM petitions WHERE id = ?')
+    const result = await selectStmt.bind(id).first<Petition>()
+    
+    if (!result) {
+      throw new Error('Petition not found after publishing')
+    }
+    
+    return result
+  }
+
   async updatePetition(id: number, petitionData: Partial<CreatePetitionInput>): Promise<Petition> {
     // Build dynamic update query
     const updateFields: string[] = []
-    const values: any[] = []
+    const values: unknown[] = []
 
     if (petitionData.title !== undefined) {
       updateFields.push('title = ?')

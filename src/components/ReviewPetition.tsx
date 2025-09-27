@@ -66,8 +66,8 @@ export default function ReviewPetition() {
     try {
       setIsPublishing(true)
       
-      // For now, just navigate to the petition page
-      // TODO: Add publish API endpoint to update petition status
+      // Publish the petition
+      await petitionApi.publish(petition.id)
       
       // Navigate to the published petition
       navigate(`/petition/${petition.slug}?published=true`)
