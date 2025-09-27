@@ -3,7 +3,8 @@ import {
   handleCORS, 
   createSuccessResponse, 
   createCachedErrorResponse,
-  getDbService 
+  getDbService,
+  invalidateCachePattern
 } from '../../../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
@@ -24,6 +25,11 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
 
     // Publish the petition
     const petition = await db.publishPetition(petitionId)
+    
+    // Invalidate petition caches when a petition is published
+    console.log(`📢 Petition ${petitionId} published - invalidating petition caches`)
+    await invalidateCachePattern('petitions:', context.env.CACHE)
+    await invalidateCachePattern('petition:', context.env.CACHE)
     
     return createSuccessResponse(petition)
   } catch (error) {

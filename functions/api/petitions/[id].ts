@@ -5,7 +5,10 @@ import {
   createSuccessResponse, 
   createCachedResponse,
   createCachedErrorResponse,
-  getDbService 
+  getDbService,
+  invalidateCachePattern,
+  generateCacheKey,
+  getOrSetCache
 } from '../../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
@@ -21,18 +24,34 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
     }
 
     if (context.request.method === 'GET') {
-      const petition = await db.getPetitionById(petitionId)
-      if (!petition) {
-        return createCachedErrorResponse('Petition not found', context.request, context.env, 404)
-      }
-      // Cache individual petition for 10 minutes (they don't change often)
-      return createCachedResponse(petition, context.request, context.env, 600)
+      // Generate cache key for this specific petition
+      const cacheKey = generateCacheKey(context.request, 'petition')
+      
+      const petition = await getOrSetCache(
+        cacheKey,
+        context.env.CACHE,
+        async () => {
+          const result = await db.getPetitionById(petitionId)
+          if (!result) {
+            throw new Error('Petition not found')
+          }
+          return result
+        },
+        10 * 60 // Cache for 10 minutes
+      )
+      
+      return createCachedResponse(petition, context.request, context.env, 10 * 60)
     }
 
     if (context.request.method === 'PUT') {
       const petitionData: Partial<CreatePetitionInput> = await context.request.json()
       const updatedPetition = await db.updatePetition(petitionId, petitionData)
-      // Don't cache PUT responses as they represent fresh updates
+      
+      // Invalidate all petition caches when a petition is updated
+      console.log(`📝 Petition ${petitionId} updated - invalidating petition caches`)
+      await invalidateCachePattern('petitions:', context.env.CACHE)
+      await invalidateCachePattern('petition:', context.env.CACHE)
+      
       return createSuccessResponse(updatedPetition)
     }
 

@@ -20,6 +20,8 @@ export default function PetitionDetail() {
   const [showSignForm, setShowSignForm] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
   const [sharedPlatform, setSharedPlatform] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+  const [justUpdated, setJustUpdated] = useState(false)
 
   const fetchPetition = useCallback(async () => {
     try {
@@ -55,7 +57,57 @@ export default function PetitionDetail() {
   }
 
   const handleSignSuccess = async () => {
-    await fetchPetition()
+    setRefreshing(true)
+    
+    try {
+      // Add a small delay to ensure the server has processed the signature
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Force a fresh fetch to get updated data with cache busting
+      const timestamp = Date.now()
+      const cacheBustingUrl = `/api/petition/${slug}?_t=${timestamp}`
+      
+      const response = await fetch(cacheBustingUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      
+      const data = await response.json() as PetitionWithDetails
+      setPetition(data)
+
+      // Fetch updated signatures with cache busting
+      const signaturesResponse = await fetch(`/api/petitions/${data.id}/signatures?limit=20&_t=${timestamp}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache'
+        }
+      })
+      
+      if (signaturesResponse.ok) {
+        const signatures = await signaturesResponse.json() as Signature[]
+        setSignatures(signatures)
+      }
+      
+      console.log('✅ Petition data refreshed after signing - new count:', data.current_count)
+      
+      // Show success indicator briefly
+      setJustUpdated(true)
+      setTimeout(() => setJustUpdated(false), 3000)
+    } catch (err) {
+      console.error('Failed to refresh petition after signing:', err)
+      // Fallback to the original fetch method
+      await fetchPetition()
+    } finally {
+      setRefreshing(false)
+    }
   }
 
   const handleCopyLink = async () => {
@@ -278,8 +330,19 @@ export default function PetitionDetail() {
                 {/* Progress */}
                 <div className="mb-6">
                   <div className="flex justify-between text-sm text-gray-600 mb-2">
-                    <span className="font-semibold">
+                    <span className="font-semibold flex items-center gap-2">
                       {petition.current_count.toLocaleString()} signed
+                      {refreshing && (
+                        <div className="animate-spin h-4 w-4 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                      )}
+                      {justUpdated && !refreshing && (
+                        <div className="flex items-center gap-1 text-green-600 animate-pulse">
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-xs">Updated!</span>
+                        </div>
+                      )}
                     </span>
                     <span>{petition.target_count.toLocaleString()} goal</span>
                   </div>
