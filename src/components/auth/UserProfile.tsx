@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { User, Settings, LogOut } from 'lucide-react'
+import { User, LogOut } from 'lucide-react'
 
 export default function UserProfile() {
   const { t } = useTranslation('common')

@@ -7,7 +7,7 @@ import { Badge } from './ui/badge'
 import { petitionApi, categoryApi, ApiError } from '../services/api'
 import type { Category } from '../types/api'
 import MDEditor from '@uiw/react-md-editor'
-import { useAuth } from '../hooks/useAuth'
+import { useAuth, type Session } from '../hooks/useAuth'
 import { useTranslation } from 'react-i18next'
 
 interface CreatePetitionFormData {
@@ -23,7 +23,11 @@ interface CreatePetitionFormData {
 
 export default function CreatePetition() {
   const navigate = useNavigate()
-  const { session, status, signIn } = useAuth()
+  const { session, status, signIn }: {
+    session: Session | null;
+    status: 'loading' | 'authenticated' | 'unauthenticated';
+    signIn: (provider: 'google' | 'facebook') => Promise<void>
+  } = useAuth()
   const { t } = useTranslation('common')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -280,7 +284,7 @@ export default function CreatePetition() {
                 <div className="space-y-3">
                   <Button
                     onClick={() => signIn('google')}
-                    disabled={status === 'loading'}
+                    disabled={isSubmitting}
                     className="w-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center gap-3 h-12"
                   >
                     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -294,7 +298,7 @@ export default function CreatePetition() {
 
                   <Button
                     onClick={() => signIn('facebook')}
-                    disabled={status === 'loading'}
+                    disabled={isSubmitting}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-3 h-12"
                   >
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">

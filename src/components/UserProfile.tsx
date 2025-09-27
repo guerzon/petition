@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import { useTranslation } from 'react-i18next'
 import { useAuth } from '../hooks/useAuth'
 import { Card, CardContent } from './ui/card'
 import { Button } from './ui/button'
@@ -14,7 +13,6 @@ import {
   Users,
   Target,
   Heart,
-  MessageSquare,
   BarChart3,
   Settings,
   User
@@ -27,11 +25,9 @@ interface UserStats {
 }
 
 export default function UserProfile() {
-  const { t } = useTranslation('common')
   const { session, status } = useAuth()
   const [activeTab, setActiveTab] = useState<'overview' | 'created' | 'supported'>('overview')
   const [createdPetitions, setCreatedPetitions] = useState<Petition[]>([])
-  const [supportedPetitions, setSupportedPetitions] = useState<Petition[]>([])
   const [userStats, setUserStats] = useState<UserStats>({
     petitionsCreated: 0,
     petitionsSigned: 0,
@@ -39,13 +35,7 @@ export default function UserProfile() {
   })
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      loadUserData()
-    }
-  }, [status, session])
-
-  const loadUserData = async () => {
+  const loadUserData = useCallback(async () => {
     if (!session?.user?.id) return
 
     try {
@@ -71,7 +61,13 @@ export default function UserProfile() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [session?.user?.id])
+
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      loadUserData()
+    }
+  }, [status, session, loadUserData])
 
   if (status === 'loading') {
     return (

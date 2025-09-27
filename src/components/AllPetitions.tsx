@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { petitionApi } from '@/services/api'
 import type { PetitionWithDetails } from '@/types/api'
+import SEO from './SEO'
 
 export default function AllPetitions() {
   const [petitions, setPetitions] = useState<PetitionWithDetails[]>([])
@@ -71,8 +72,62 @@ export default function AllPetitions() {
     petition.categories.some(cat => cat.name.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "All Petitions - PetitionHub",
+    "description": "Browse and support petitions that matter to you. Discover local and national campaigns for change.",
+    "url": "https://petition.example.com/petitions",
+    "mainEntity": {
+      "@type": "ItemList",
+      "name": "Petition Collection",
+      "numberOfItems": petitions.length,
+      "itemListElement": filteredPetitions.slice(0, 10).map((petition, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Petition",
+          "name": petition.title,
+          "description": petition.description,
+          "url": `https://petition.example.com/petition/${petition.slug}`,
+          "creator": {
+            "@type": "Person",
+            "name": petition.creator.name
+          },
+          "signatureCount": petition.current_count,
+          "target": petition.target_count
+        }
+      }))
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://petition.example.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "All Petitions",
+          "item": "https://petition.example.com/petitions"
+        }
+      ]
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <>
+      <SEO
+        title="All Petitions"
+        description="Browse and support petitions that matter to you. Discover local and national campaigns for social change, community activism, and civic engagement."
+        keywords="browse petitions, find petitions, social change campaigns, community activism, civic engagement, local petitions, national petitions, advocacy"
+        url="https://petition.example.com/petitions"
+        structuredData={structuredData}
+      />
+      <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">All Petitions</h1>
@@ -218,6 +273,7 @@ export default function AllPetitions() {
           </>
         )}
       </div>
-    </div>
+      </div>
+    </>
   )
 }
