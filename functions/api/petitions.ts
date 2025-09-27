@@ -20,7 +20,15 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
       const type = url.searchParams.get('type') as 'local' | 'national' | undefined
       const limit = parseInt(url.searchParams.get('limit') || '50')
       const offset = parseInt(url.searchParams.get('offset') || '0')
+      const userId = url.searchParams.get('userId')
 
+      // If userId is provided, get petitions for specific user
+      if (userId) {
+        const petitions = await db.getUserPetitions(userId)
+        return createSuccessResponse(petitions)
+      }
+
+      // Otherwise get all petitions
       const petitions = await db.getAllPetitions(limit, offset, type)
       return createSuccessResponse(petitions)
     }

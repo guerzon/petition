@@ -108,7 +108,7 @@ export const petitionApi = {
   },
 
   async getByUser(userId: string): Promise<Petition[]> {
-    return apiRequest<Petition[]>(`/api/users/${userId}/petitions`)
+    return apiRequest<Petition[]>(`/api/petitions?userId=${encodeURIComponent(userId)}`)
   },
 
   async update(id: number, petitionData: Partial<CreatePetitionInput>): Promise<Petition> {
