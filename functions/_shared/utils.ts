@@ -18,17 +18,16 @@ export function getCorsHeaders(request: Request, env: Env): Record<string, strin
   ]
 
   // Determine if we're in production (check for production environment variable)
-  // const isProduction =
-  //   env.ENVIRONMENT === 'production' || env.NODE_ENV === 'production' ? true : false
+  const isProduction =
+    env.ENVIRONMENT === 'production' || env.NODE_ENV === 'production' ? true : false
 
   // In production, only allow production origins
   // In development, allow both production and development origins
-  // const allowedOrigins = isProduction
-  //   ? productionOrigins
-  //   : [...productionOrigins, ...developmentOrigins]
-  const allowedOrigins = [...productionOrigins, ...developmentOrigins]
+  const allowedOrigins = isProduction
+    ? productionOrigins
+    : [...productionOrigins, ...developmentOrigins]
 
-  // // Check if the origin is allowed
+  // Check if the origin is allowed
   const allowedOrigin = allowedOrigins.includes(origin || '') ? origin : null
 
   const headers: Record<string, string> = {
