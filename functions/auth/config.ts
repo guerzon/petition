@@ -60,7 +60,7 @@ export function createAuthConfig(env: Env): AuthConfig {
         if (session?.user && user) {
           session.user.id = user.id
           session.user.name = user.name
-          session.user.email = user.email
+          // session.user.email = user.email // We don't need to save the email. A callback from the Google/Facebook is enough.
           session.user.image = user.image
         }
         return session

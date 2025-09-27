@@ -6,6 +6,11 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/', // or your subdirectory if deployed to one
+  build: {
+    outDir: 'dist',
+    assetsDir: 'client/assets',
+  },
   plugins: [
     react(),
     cloudflare({
