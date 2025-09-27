@@ -1,9 +1,13 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { User, Settings, LogOut } from 'lucide-react'
 
 export default function UserProfile() {
+  const { t } = useTranslation('common')
   const { session, status, signOut } = useAuth()
   const [showMenu, setShowMenu] = useState(false)
 
@@ -56,13 +60,24 @@ export default function UserProfile() {
                 <p className="font-medium text-gray-900">{user.name}</p>
                 <p className="text-sm text-gray-500">{user.email}</p>
               </div>
-              <Button
-                onClick={signOut}
-                variant="outline"
-                className="w-full text-gray-700 border-gray-300 hover:bg-gray-50"
-              >
-                Sign Out
-              </Button>
+              <div className="space-y-2">
+                <Link
+                  to="/profile"
+                  onClick={() => setShowMenu(false)}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                >
+                  <User className="w-4 h-4" />
+{t('profile.myProfile')}
+                </Link>
+                <Button
+                  onClick={signOut}
+                  variant="outline"
+                  className="w-full text-gray-700 border-gray-300 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </>

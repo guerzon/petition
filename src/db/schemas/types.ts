@@ -67,6 +67,7 @@ export interface CreatePetitionInput {
   due_date?: string // Optional, will default to 60 days from now
   created_by: string // Changed from number to string
   category_ids?: number[]
+  status?: 'active' | 'completed' | 'closed' // Optional, defaults to 'active'
 }
 
 export interface CreateSignatureInput {

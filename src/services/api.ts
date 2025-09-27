@@ -106,6 +106,17 @@ export const petitionApi = {
 
     return apiRequest<Signature[]>(`/api/petitions/${petitionId}/signatures?${searchParams}`)
   },
+
+  async getByUser(userId: string): Promise<Petition[]> {
+    return apiRequest<Petition[]>(`/api/users/${userId}/petitions`)
+  },
+
+  async update(id: number, petitionData: Partial<CreatePetitionInput>): Promise<Petition> {
+    return apiRequest<Petition>(`/api/petitions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(petitionData),
+    })
+  },
 }
 
 // Signature API

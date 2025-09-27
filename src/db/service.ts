@@ -77,9 +77,12 @@ export class DatabaseService {
   async createPetition(petitionData: CreatePetitionInput): Promise<Petition> {
     const dueDate = this.getDueDate(petitionData.due_date)
 
+    // Generate initial slug without ID (we'll update it after getting the ID)
+    const tempSlug = this.generateSlug(petitionData.title)
+
     const stmt = this.db.prepare(`
-      INSERT INTO petitions (title, description, type, image_url, target_count, location, due_date, created_by)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO petitions (title, description, type, image_url, target_count, location, due_date, slug, created_by)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       RETURNING *
     `)
 
@@ -92,6 +95,7 @@ export class DatabaseService {
         petitionData.target_count || 1000,
         petitionData.location || null,
         dueDate,
+        tempSlug,
         petitionData.created_by
       )
       .first<Petition>()
@@ -100,10 +104,10 @@ export class DatabaseService {
       throw new Error('Failed to create petition')
     }
 
-    // Generate and update slug
-    const slug = this.generateSlug(petitionData.title, result.id)
+    // Generate final slug with ID and update
+    const finalSlug = this.generateSlug(petitionData.title, result.id)
     const updateSlugStmt = this.db.prepare('UPDATE petitions SET slug = ? WHERE id = ?')
-    await updateSlugStmt.bind(slug, result.id).run()
+    await updateSlugStmt.bind(finalSlug, result.id).run()
 
     // Add categories if provided
     if (petitionData.category_ids && petitionData.category_ids.length > 0) {
@@ -112,8 +116,8 @@ export class DatabaseService {
       }
     }
 
-    // Return updated petition with slug
-    return { ...result, slug }
+    // Return updated petition with final slug
+    return { ...result, slug: finalSlug }
   }
 
   async getPetitionBySlug(slug: string): Promise<PetitionWithDetails | null> {
@@ -257,6 +261,91 @@ export class DatabaseService {
     }
 
     return petitionsWithDetails
+  }
+
+  async getUserPetitions(userId: string): Promise<Petition[]> {
+    const stmt = this.db.prepare(`
+      SELECT * FROM petitions
+      WHERE created_by = ?
+      ORDER BY created_at DESC
+    `)
+    const result = await stmt.bind(userId).all<Petition>()
+    return result.results || []
+  }
+
+  async updatePetition(id: number, petitionData: Partial<CreatePetitionInput>): Promise<Petition> {
+    // Build dynamic update query
+    const updateFields: string[] = []
+    const values: any[] = []
+
+    if (petitionData.title !== undefined) {
+      updateFields.push('title = ?')
+      values.push(petitionData.title)
+    }
+    if (petitionData.description !== undefined) {
+      updateFields.push('description = ?')
+      values.push(petitionData.description)
+    }
+    if (petitionData.type !== undefined) {
+      updateFields.push('type = ?')
+      values.push(petitionData.type)
+    }
+    if (petitionData.image_url !== undefined) {
+      updateFields.push('image_url = ?')
+      values.push(petitionData.image_url)
+    }
+    if (petitionData.target_count !== undefined) {
+      updateFields.push('target_count = ?')
+      values.push(petitionData.target_count)
+    }
+    if (petitionData.location !== undefined) {
+      updateFields.push('location = ?')
+      values.push(petitionData.location)
+    }
+    if (petitionData.status !== undefined) {
+      updateFields.push('status = ?')
+      values.push(petitionData.status)
+    }
+
+    // Update slug if title changed
+    if (petitionData.title !== undefined) {
+      const newSlug = this.generateSlug(petitionData.title, id)
+      updateFields.push('slug = ?')
+      values.push(newSlug)
+    }
+
+    if (updateFields.length === 0) {
+      throw new Error('No fields to update')
+    }
+
+    updateFields.push('updated_at = CURRENT_TIMESTAMP')
+    values.push(id)
+
+    const stmt = this.db.prepare(`
+      UPDATE petitions
+      SET ${updateFields.join(', ')}
+      WHERE id = ?
+      RETURNING *
+    `)
+
+    const result = await stmt.bind(...values).first<Petition>()
+    if (!result) {
+      throw new Error('Failed to update petition')
+    }
+
+    // Update categories if provided
+    if (petitionData.category_ids !== undefined) {
+      // Remove existing categories
+      const removeStmt = this.db.prepare('DELETE FROM petition_categories WHERE petition_id = ?')
+      await removeStmt.bind(id).run()
+
+      // Add new categories
+      for (const categoryId of petitionData.category_ids) {
+        await this.addPetitionCategory(id, categoryId)
+      }
+    }
+
+    return result
   }
 
   // Signature methods
