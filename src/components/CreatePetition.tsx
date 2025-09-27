@@ -38,7 +38,7 @@ export default function CreatePetition() {
   const [formData, setFormData] = useState<CreatePetitionFormData>({
     title: '',
     description: '',
-    type: 'local',
+    type: 'national',
     location: '',
     targetCount: 1000,
     imageUrl: '',
@@ -357,10 +357,10 @@ export default function CreatePetition() {
           <p className="mt-2 text-lg text-gray-600">{t('create.subtitle')}</p>
         </div>
 
-        <Card className="p-8">
+        <Card className="p-8 bg-white shadow-lg border border-gray-200">
           {submitError && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-              <p className="text-sm text-red-600">{submitError}</p>
+              <p className="text-sm text-red-700 font-medium">{submitError}</p>
             </div>
           )}
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -369,36 +369,10 @@ export default function CreatePetition() {
               <label className="text-base font-medium text-gray-900">
                 {t('create.petitionType')}
               </label>
-              <p className="text-sm leading-5 text-gray-500 mb-4">
+              <p className="text-sm leading-5 text-gray-700 mb-4">
                 Choose whether your petition addresses local or national issues
               </p>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <Card
-                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
-                    formData.type === 'local'
-                      ? 'border-2 border-blue-500 bg-blue-50'
-                      : 'border border-gray-300 hover:border-gray-400'
-                  }`}
-                  onClick={() => handleInputChange('type', 'local')}
-                >
-                  <div className="p-6">
-                    <div className="flex items-center">
-                      <input
-                        id="local"
-                        name="petition-type"
-                        type="radio"
-                        checked={formData.type === 'local'}
-                        onChange={() => handleInputChange('type', 'local')}
-                        className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <label htmlFor="local" className="ml-3 text-lg font-medium text-gray-900">
-                        {t('create.local')}
-                      </label>
-                    </div>
-                    <p className="mt-2 text-sm text-gray-600">{t('create.localDescription')}</p>
-                  </div>
-                </Card>
-
                 <Card
                   className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
                     formData.type === 'national'
@@ -421,7 +395,33 @@ export default function CreatePetition() {
                         {t('create.national')}
                       </label>
                     </div>
-                    <p className="mt-2 text-sm text-gray-600">{t('create.nationalDescription')}</p>
+                    <p className="mt-2 text-sm text-gray-700">{t('create.nationalDescription')}</p>
+                  </div>
+                </Card>
+
+                <Card
+                  className={`cursor-pointer transition-all duration-200 hover:shadow-md ${
+                    formData.type === 'local'
+                      ? 'border-2 border-blue-500 bg-blue-50'
+                      : 'border border-gray-300 hover:border-gray-400'
+                  }`}
+                  onClick={() => handleInputChange('type', 'local')}
+                >
+                  <div className="p-6">
+                    <div className="flex items-center">
+                      <input
+                        id="local"
+                        name="petition-type"
+                        type="radio"
+                        checked={formData.type === 'local'}
+                        onChange={() => handleInputChange('type', 'local')}
+                        className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                      <label htmlFor="local" className="ml-3 text-lg font-medium text-gray-900">
+                        {t('create.local')}
+                      </label>
+                    </div>
+                    <p className="mt-2 text-sm text-gray-700">{t('create.localDescription')}</p>
                   </div>
                 </Card>
               </div>
@@ -430,10 +430,10 @@ export default function CreatePetition() {
             {/* Location field for local petitions */}
             {formData.type === 'local' && (
               <div>
-                <label htmlFor="location" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="location" className="block text-sm font-medium text-gray-900">
                   {t('create.location')} *
                 </label>
-                <p className="text-sm text-gray-500 mb-2">
+                <p className="text-sm text-gray-700 mb-2">
                   Specify the city, county, or state this petition addresses
                 </p>
                 <Input
@@ -444,16 +444,31 @@ export default function CreatePetition() {
                   placeholder={t('create.locationPlaceholder')}
                   className={errors.location ? 'border-red-300' : ''}
                 />
-                {errors.location && <p className="mt-1 text-sm text-red-600">{errors.location}</p>}
+                {errors.location && (
+                  <div className="mt-2 flex items-center">
+                    <svg
+                      className="h-4 w-4 text-red-500 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <p className="text-sm text-red-700 font-medium">{errors.location}</p>
+                  </div>
+                )}
               </div>
             )}
 
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="title" className="block text-sm font-medium text-gray-900">
                 {t('create.petitionTitle')} *
               </label>
-              <p className="text-sm text-gray-500 mb-2">
+              <p className="text-sm text-gray-700 mb-2">
                 Create a clear, compelling title that summarizes your petition
               </p>
               <Input
@@ -465,18 +480,33 @@ export default function CreatePetition() {
                 className={errors.title ? 'border-red-300' : ''}
                 maxLength={150}
               />
-              <div className="flex justify-between items-center mt-1">
-                {errors.title && <p className="text-sm text-red-600">{errors.title}</p>}
+              <div className="flex justify-between items-start mt-1">
+                {errors.title && (
+                  <div className="flex items-center">
+                    <svg
+                      className="h-4 w-4 text-red-500 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <p className="text-sm text-red-700 font-medium">{errors.title}</p>
+                  </div>
+                )}
                 <p className="text-xs text-gray-500 ml-auto">{formData.title.length}/150</p>
               </div>
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 {t('create.petitionDescription')} *
               </label>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-700 mb-4">
                 Explain the issue, why it matters, and what action you want taken. You can use
                 markdown formatting for better presentation.
               </p>
@@ -491,19 +521,35 @@ export default function CreatePetition() {
                   visibleDragbar={false}
                   textareaProps={{
                     placeholder: t('create.descriptionPlaceholder'),
-                    style: { minHeight: '200px' },
+                    style: { minHeight: '200px', maxHeight: '400px' },
                   }}
+                  style={{ border: '1px solid #ccc', borderRadius: '0' }}
                   height={300}
                 />
               </div>
-              <div className="flex justify-between items-center mt-2">
-                {errors.description && <p className="text-sm text-red-600">{errors.description}</p>}
+              <div className="flex justify-between items-start mt-2">
+                {errors.description && (
+                  <div className="flex items-center">
+                    <svg
+                      className="h-4 w-4 text-red-500 mr-1"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                    <p className="text-sm text-red-700 font-medium">{errors.description}</p>
+                  </div>
+                )}
                 <p className="text-xs text-gray-500 ml-auto">
                   {formData.description.length} characters
                 </p>
               </div>
 
-              <div className="mt-2 text-xs text-gray-500">
+              <div className="mt-2 text-xs text-gray-800">
                 <p className="font-medium mb-1">Markdown formatting tips:</p>
                 <div className="grid grid-cols-2 gap-2">
                   <span>**Bold text**</span>
@@ -516,10 +562,10 @@ export default function CreatePetition() {
 
             {/* Image Upload */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 {t('create.petitionImage')}
               </label>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-700 mb-4">
                 Add an image to make your petition more compelling (Max 5MB)
               </p>
 
@@ -527,7 +573,7 @@ export default function CreatePetition() {
                 <div className="flex items-center justify-center w-full">
                   <label
                     htmlFor="image-upload"
-                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 hover:border-gray-400"
+                    className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-white hover:bg-gray-50 hover:border-gray-400"
                   >
                     <div className="flex flex-col items-center justify-center pt-5 pb-6">
                       {formData.imageUrl ? (
@@ -550,11 +596,11 @@ export default function CreatePetition() {
                               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                             />
                           </svg>
-                          <p className="mb-2 text-sm text-gray-500">
+                          <p className="mb-2 text-sm text-gray-700">
                             <span className="font-semibold">{t('create.chooseImage')}</span> or drag
                             and drop
                           </p>
-                          <p className="text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                          <p className="text-xs text-gray-600">PNG, JPG, GIF up to 5MB</p>
                         </>
                       )}
                     </div>
@@ -601,15 +647,30 @@ export default function CreatePetition() {
                 )}
               </div>
 
-              {errors.imageUrl && <p className="mt-1 text-sm text-red-600">{errors.imageUrl}</p>}
+              {errors.imageUrl && (
+                <div className="mt-2 flex items-center">
+                  <svg
+                    className="h-4 w-4 text-red-500 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <p className="text-sm text-red-700 font-medium">{errors.imageUrl}</p>
+                </div>
+              )}
             </div>
 
             {/* Target Count */}
             <div>
-              <label htmlFor="targetCount" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="targetCount" className="block text-sm font-medium text-gray-900">
                 {t('create.targetSignatures')}
               </label>
-              <p className="text-sm text-gray-500 mb-2">
+              <p className="text-sm text-gray-700 mb-2">
                 Set a goal for how many signatures you want to collect
               </p>
               <Input
@@ -622,16 +683,29 @@ export default function CreatePetition() {
                 className={errors.targetCount ? 'border-red-300' : ''}
               />
               {errors.targetCount && (
-                <p className="mt-1 text-sm text-red-600">{errors.targetCount}</p>
+                <div className="mt-2 flex items-center">
+                  <svg
+                    className="h-4 w-4 text-red-500 mr-1"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <p className="text-sm text-red-700 font-medium">{errors.targetCount}</p>
+                </div>
               )}
             </div>
 
             {/* Categories */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-2">
                 {t('create.categories')}
               </label>
-              <p className="text-sm text-gray-500 mb-3">
+              <p className="text-sm text-gray-700 mb-3">
                 Select categories that best describe your petition
               </p>
 
@@ -661,7 +735,7 @@ export default function CreatePetition() {
               {/* Selected Categories as Tags */}
               {formData.categories.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Selected categories:</p>
+                  <p className="text-sm font-medium text-gray-900 mb-2">Selected categories:</p>
                   <div className="flex flex-wrap gap-2">
                     {formData.categories.map(categoryId => {
                       const category = categories.find(c => c.id === categoryId)
@@ -718,6 +792,40 @@ export default function CreatePetition() {
                     {session.user.name && session.user.email && (
                       <p className="text-sm text-green-700">{session.user.email}</p>
                     )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error Summary */}
+            {Object.keys(errors).length > 0 && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-red-800">
+                      Please fix the following errors before submitting:
+                    </h3>
+                    <div className="mt-2 text-sm text-red-700">
+                      <ul className="list-disc list-inside space-y-1">
+                        {Object.entries(errors).map(([field, error]) => (
+                          <li key={field}>
+                            <span className="font-medium capitalize">
+                              {field === 'targetCount' ? 'Target signatures' : field}:
+                            </span>{' '}
+                            {error}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
