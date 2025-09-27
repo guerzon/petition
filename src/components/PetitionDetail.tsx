@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -9,7 +9,28 @@ import SignPetitionModal from './SignPetitionModal'
 import { Share, Copy, Check } from 'lucide-react'
 import { SiFacebook, SiX, SiWhatsapp, SiTelegram } from '@icons-pack/react-simple-icons'
 
-export default function PetitionDetail() {
+// Loading fallback component for Suspense
+function PetitionDetailFallback() {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
+          <div className="bg-white p-6 rounded-lg shadow">
+            <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+            <div className="h-2 bg-gray-200 rounded w-full mb-4"></div>
+            <div className="h-10 bg-gray-200 rounded w-32"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function PetitionDetailContent() {
   const { slug } = useParams<{ slug: string }>()
   const { hasSignedPetition, isAuthenticated } = useUserSignatures()
 
@@ -142,23 +163,7 @@ export default function PetitionDetail() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
-            <div className="bg-white p-6 rounded-lg shadow">
-              <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-              <div className="h-2 bg-gray-200 rounded w-full mb-4"></div>
-              <div className="h-10 bg-gray-200 rounded w-32"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <PetitionDetailFallback />
   }
 
   if (error || !petition) {
@@ -180,11 +185,11 @@ export default function PetitionDetail() {
 
   return (
     <>
-      <title>{petition.title} | Petition By BetterGov.ph</title>
+      <title>{`${petition.title} | Petition By BetterGov.ph`}</title>
       <meta name="description" content={petition.description.slice(0, 160)} />
       <meta name="keywords" content={petition.categories.map(cat => cat.name).join(', ')} />
       <meta name="author" content={petition.creator.name} />
-      <meta property="og:title" content={petition.title} />
+      <meta property="og:title" content={`${petition.title} | Petition By BetterGov.ph`} />
       <meta property="og:description" content={petition.description.slice(0, 160)} />
       <meta property="og:type" content="article" />
       <meta property="og:url" content={`https://petition.ph/petition/${petition.slug}`} />
@@ -499,5 +504,14 @@ export default function PetitionDetail() {
         </div>
       </div>
     </>
+  )
+}
+
+// Main component with Suspense wrapper
+export default function PetitionDetail() {
+  return (
+    <Suspense fallback={<PetitionDetailFallback />}>
+      <PetitionDetailContent />
+    </Suspense>
   )
 }

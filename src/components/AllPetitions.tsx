@@ -95,16 +95,16 @@ export default function AllPetitions() {
         content="Browse and support petitions that matter to you. Discover local and national campaigns for change."
       />
       <meta property="og:type" content="website" />
-      <meta property="og:url" content="https://petition.example.com/petitions" />
-      <meta property="og:image" content="https://petition.example.com/og-image.jpg" />
+      <meta property="og:url" content="https://petition.ph/petitions" />
+      <meta property="og:image" content="https://petition.ph/og-image.jpg" />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="All Petitions | Petition by BetterGov.ph" />
       <meta
         name="twitter:description"
         content="Browse and support petitions that matter to you. Discover local and national campaigns for change."
       />
-      <meta name="twitter:image" content="https://petition.example.com/og-image.jpg" />
-      <link rel="canonical" href="https://petition.example.com/petitions" />
+      <meta name="twitter:image" content="https://petition.ph/og-image.jpg" />
+      <link rel="canonical" href="https://petition.ph/petitions" />
 
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
