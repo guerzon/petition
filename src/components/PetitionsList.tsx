@@ -100,8 +100,8 @@ export default function PetitionsList() {
             const primaryCategory = petition.categories[0]?.name || 'General'
 
             return (
-              <Card key={petition.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
+              <Card key={petition.id} className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
+                <CardHeader className="pb-3">
                   <div className="flex justify-between items-start mb-2">
                     <Badge variant="secondary">{primaryCategory}</Badge>
                     <span className="text-sm text-gray-500">{daysLeft} days left</span>
@@ -112,14 +112,14 @@ export default function PetitionsList() {
                     </Link>
                   </CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="flex flex-col flex-grow">
                   <p className="text-gray-800 mb-4 line-clamp-3">{petition.description}</p>
 
                   {petition.type === 'local' && petition.location && (
                     <p className="text-sm text-blue-600 mb-2">📍 {petition.location}</p>
                   )}
 
-                  <div className="mb-4">
+                  <div className="mb-4 flex-grow">
                     <div className="flex justify-between text-sm text-gray-600 mb-1">
                       <span>{petition.current_count.toLocaleString()} signatures</span>
                       <span>{petition.target_count.toLocaleString()} target</span>
@@ -133,7 +133,7 @@ export default function PetitionsList() {
                     <div className="text-sm text-gray-500 mt-1">{progressPercentage}% complete</div>
                   </div>
 
-                  <Link to={`/petition/${petition.slug}`}>
+                  <Link to={`/petition/${petition.slug}`} className="mt-auto">
                     <Button className="w-full text-white">View & Sign Petition</Button>
                   </Link>
                 </CardContent>

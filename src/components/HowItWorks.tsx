@@ -130,14 +130,14 @@ export default function HowItWorks() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/create">
-                <Button className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-6 text-lg">
+                <Button className="bg-white border border-white text-blue-600 hover:bg-gray-100 px-8 py-6 text-lg transition-all duration-300 transform hover:scale-105">
                   {t('howItWorks.startPetition')}
                 </Button>
               </Link>
               <Link to="/petitions">
                 <Button
                   variant="outline"
-                  className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-6 text-lg"
+                  className="border-white text-white hover:bg-white hover:text-blue-600 px-8 py-6 text-lg transition-all duration-300 transform hover:scale-105"
                 >
                   {t('howItWorks.browsePetitions')}
                 </Button>
