@@ -2,7 +2,7 @@
 import type { Env, EventContext } from './_shared/types'
 
 // Import individual function handlers
-import { onRequest as testHandler } from './api/test'
+import { onRequest as uptimeHandler } from './api/uptime'
 import { onRequest as usersHandler } from './api/users'
 import { onRequest as userByIdHandler } from './api/users/[id]'
 import { onRequest as userSignaturesHandler } from './api/users/[id]/signatures'
@@ -73,6 +73,9 @@ export default {
         return response
       }
 
+      if (path === '/api/uptime') {
+        return await uptimeHandler(createContext(request, env))
+      }
 
       if (path === '/api/users') {
         return await usersHandler(createContext(request, env))
