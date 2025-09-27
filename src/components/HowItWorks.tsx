@@ -161,36 +161,43 @@ export default function HowItWorks() {
             </p>
           </div>
 
-          <div className="space-y-12">
-            {steps.map((step, index) => (
-              <div key={step.step} className="flex flex-col lg:flex-row items-center gap-8">
-                <div className={`flex-shrink-0 ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                  <div className="w-80 h-64 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl overflow-hidden">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8">
+            {steps.map((step) => (
+              <div key={step.step} className="flex flex-col">
+                {/* Image */}
+                <div className="relative mb-6">
+                  <div className="aspect-[4/3] bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl overflow-hidden">
                     <img
                       src={step.image}
                       alt={step.title}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                </div>
-
-                <div className={`flex-1 ${index % 2 === 1 ? 'lg:order-1 lg:text-right' : ''}`}>
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className={`w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                  {/* Step Number Overlay */}
+                  <div className="absolute -top-3 -left-3">
+                    <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl shadow-lg">
                       {step.step}
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900">{step.title}</h3>
                   </div>
+                </div>
 
-                  <p className="text-lg text-gray-600 mb-6">{step.description}</p>
-
+                {/* Content */}
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                  <p className="text-gray-600 mb-4 text-sm leading-relaxed">{step.description}</p>
+                  
                   <ul className="space-y-2">
-                    {step.details.map((detail, detailIndex) => (
-                      <li key={detailIndex} className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                        <span className="text-gray-700">{detail}</span>
+                    {step.details.slice(0, 3).map((detail, detailIndex) => (
+                      <li key={detailIndex} className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-gray-700 text-sm">{detail}</span>
                       </li>
                     ))}
+                    {step.details.length > 3 && (
+                      <li className="text-gray-500 text-sm italic">
+                        +{step.details.length - 3} more...
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>
