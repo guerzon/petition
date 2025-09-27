@@ -29,8 +29,11 @@ database_id = "c59456f6-7137-4c00-a3c7-e9c56ccd820e"
 
 [[kv_namespaces]]
 binding = "CACHE"
-id = "petition-cache"
-preview_id = "petition-cache-preview"
+id = "59e9ad32e1154c1ca44f277c44c5e9f0"
+preview_id = "59e9ad32e1154c1ca44f277c44c5e9f0"
 
 [env.staging]
 name = "petition-staging"
+
+[observability.logs]
+enabled = true
