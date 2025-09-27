@@ -2,7 +2,7 @@ import type { Env, EventContext } from '../../_shared/types'
 import { handleCORS, createErrorResponse, createSuccessResponse, createNotFoundResponse, getDbService } from '../../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
-  const corsResponse = handleCORS(context.request)
+  const corsResponse = handleCORS(context.request, context.env)
   if (corsResponse) return corsResponse
 
   try {
