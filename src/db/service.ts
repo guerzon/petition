@@ -377,7 +377,7 @@ export class DatabaseService {
     return result
   }
 
-  async getUserSignatures(userId: number): Promise<Signature[]> {
+  async getUserSignatures(userId: string): Promise<Signature[]> {
     const stmt = this.db.prepare(
       'SELECT * FROM signatures WHERE user_id = ? ORDER BY created_at DESC'
     )

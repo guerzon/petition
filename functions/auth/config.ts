@@ -77,6 +77,7 @@ export function createAuthConfig(env: Env): AuthConfig {
     },
     pages: {
       signIn: '/auth/signin',
+      signOut: '/',
       error: '/auth/error',
     },
     session: {
@@ -85,6 +86,12 @@ export function createAuthConfig(env: Env): AuthConfig {
     secret: env.AUTH_SECRET,
     trustHost: true,
     debug: true,
+    // Ensure all auth actions are enabled
+    events: {
+      async signOut(message) {
+        console.log('User signed out:', message)
+      },
+    },
   }
 
   return config

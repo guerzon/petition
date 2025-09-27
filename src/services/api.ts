@@ -221,12 +221,18 @@ export const signatureApi = {
     // Invalidate petition caches since signature count changed
     cacheUtils.invalidatePattern('GET:/api/petitions')
     cacheUtils.invalidatePattern('GET:/api/petition/')
+    // Invalidate user signatures cache to refresh signed petition list
+    cacheUtils.invalidatePattern('GET:/api/users/.*/signatures')
     
     return result
   },
 
-  async getUserSignatures(userId: number): Promise<Signature[]> {
-    return apiRequest<Signature[]>(`/api/users/${userId}/signatures`)
+  async getUserSignatures(userId: string): Promise<Signature[]> {
+    return apiRequest<Signature[]>(`/api/users/${encodeURIComponent(userId)}/signatures`)
+  },
+
+  async getUserSignedPetitionIds(userId: string): Promise<number[]> {
+    return apiRequest<number[]>(`/api/users/${encodeURIComponent(userId)}/signatures`)
   },
 }
 

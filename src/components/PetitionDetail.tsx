@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { petitionApi } from '@/services/api'
+import { useUserSignatures } from '@/hooks/useUserSignatures'
 import type { PetitionWithDetails, Signature } from '@/types/api'
 import SignPetitionModal from './SignPetitionModal'
 import { Share, Copy, Check } from 'lucide-react'
@@ -10,12 +11,12 @@ import { SiFacebook, SiX, SiWhatsapp, SiTelegram } from '@icons-pack/react-simpl
 
 export default function PetitionDetail() {
   const { slug } = useParams<{ slug: string }>()
+  const { hasSignedPetition, isAuthenticated } = useUserSignatures()
 
   const [petition, setPetition] = useState<PetitionWithDetails | null>(null)
   const [signatures, setSignatures] = useState<Signature[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
-  const [signed, setSigned] = useState(false)
   const [showSignForm, setShowSignForm] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
   const [sharedPlatform, setSharedPlatform] = useState<string | null>(null)
@@ -54,7 +55,6 @@ export default function PetitionDetail() {
   }
 
   const handleSignSuccess = async () => {
-    setSigned(true)
     await fetchPetition()
   }
 
@@ -293,10 +293,17 @@ export default function PetitionDetail() {
                 </div>
 
                 {/* Sign Button */}
-                {signed ? (
+                {isAuthenticated && hasSignedPetition(petition.id) ? (
                   <div className="text-center p-4 bg-green-50 rounded-lg mb-4">
-                    <p className="text-green-800 font-medium">✓ Thank you for signing!</p>
-                    <p className="text-sm text-green-600 mt-1">
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <p className="text-green-800 font-medium">Thank you for signing!</p>
+                    </div>
+                    <p className="text-sm text-green-600">
                       Help spread the word by sharing this petition
                     </p>
                   </div>

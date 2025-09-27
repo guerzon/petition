@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/hooks/useAuth'
 import { useModal } from '@/contexts/ModalContext'
+import { useUserSignatures } from '@/hooks/useUserSignatures'
 import { signatureApi, ApiError } from '@/services/api'
 import type { PetitionWithDetails } from '@/types/api'
 
@@ -27,12 +28,16 @@ export default function SignPetitionModal({
 }: SignPetitionModalProps) {
   const { session, status } = useAuth()
   const { showSignInModal } = useModal()
+  const { hasSignedPetition, addSignedPetition } = useUserSignatures()
   const [signForm, setSignForm] = useState<SignForm>({
     comment: '',
     anonymous: false,
   })
   const [signErrors, setSignErrors] = useState<Record<string, string>>({})
   const [signing, setSigning] = useState(false)
+
+  // Check if user has already signed this petition
+  const alreadySigned = hasSignedPetition(petition.id)
 
   const validateSignForm = (): boolean => {
     const errors: Record<string, string> = {}
@@ -69,6 +74,9 @@ export default function SignPetitionModal({
         anonymous: signForm.anonymous,
         ip_address: undefined, // Would be set server-side in real app
       })
+
+      // Optimistically update the signed petitions list
+      addSignedPetition(petition.id)
 
       // Reset form
       setSignForm({
@@ -137,6 +145,21 @@ export default function SignPetitionModal({
                 </div>
               )}
 
+              {status === 'authenticated' && alreadySigned && (
+                <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                      <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-blue-800 text-sm font-medium">
+                      You have already signed this petition
+                    </p>
+                  </div>
+                </div>
+              )}
+
             <div>
               <label className="block text-sm font-medium mb-1 text-gray-700">
                 Comment (optional)
@@ -179,10 +202,14 @@ export default function SignPetitionModal({
               {status === 'authenticated' ? (
                 <Button
                   type="submit"
-                  disabled={signing}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  disabled={signing || alreadySigned}
+                  className={`flex-1 ${
+                    alreadySigned 
+                      ? 'bg-gray-400 cursor-not-allowed' 
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  } text-white`}
                 >
-                  {signing ? 'Signing...' : 'Sign Petition'}
+                  {signing ? 'Signing...' : alreadySigned ? 'Already Signed' : 'Sign Petition'}
                 </Button>
               ) : (
                 <Button

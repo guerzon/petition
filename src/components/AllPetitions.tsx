@@ -5,9 +5,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { petitionApi } from '@/services/api'
+import { useUserSignatures } from '@/hooks/useUserSignatures'
 import type { PetitionWithDetails } from '@/types/api'
 
 export default function AllPetitions() {
+  const { hasSignedPetition, isAuthenticated } = useUserSignatures()
   const [petitions, setPetitions] = useState<PetitionWithDetails[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>('')
@@ -232,8 +234,21 @@ export default function AllPetitions() {
                           </div>
                         </div>
 
+                        {isAuthenticated && hasSignedPetition(petition.id) ? (
+                          <div className="flex items-center justify-center gap-2 p-2 bg-green-50 rounded-lg border border-green-200 mb-3">
+                            <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
+                              <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            <span className="text-sm font-medium text-green-800">You signed this</span>
+                          </div>
+                        ) : null}
+
                         <Link to={`/petition/${petition.slug}`}>
-                          <Button className="w-full">View & Sign Petition</Button>
+                          <Button className="w-full">
+                            {isAuthenticated && hasSignedPetition(petition.id) ? 'View Petition' : 'View & Sign Petition'}
+                          </Button>
                         </Link>
                       </CardContent>
                     </Card>
