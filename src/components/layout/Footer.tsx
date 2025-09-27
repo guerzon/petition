@@ -9,7 +9,8 @@ export const footerNavigation = {
       title: 'About',
       links: [
         { label: 'How It Works', href: '/how-it-works' },
-        { label: 'Terms of Use', href: '/terms-of-service' },
+        { label: 'Terms of Service', href: '/terms' },
+        { label: 'Privacy Policy', href: '/privacy' },
       ],
     },
     {

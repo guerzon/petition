@@ -60,7 +60,9 @@ export function createAuthConfig(env: Env): AuthConfig {
         if (session?.user && user) {
           session.user.id = user.id
           session.user.name = user.name
-          // session.user.email = user.email // We don't need to save the email. A callback from the Google/Facebook is enough.
+
+          // obfuscate the email as we don't really need it.
+          session.user.email = obfuscateEmail(user.email)
           session.user.image = user.image
         }
         return session
@@ -86,4 +88,10 @@ export function createAuthConfig(env: Env): AuthConfig {
   }
 
   return config
+}
+
+function obfuscateEmail(email: string): string {
+  const [local, domain] = email.split('@')
+  const obfuscatedLocal = local.slice(0, 3) + '*'.repeat(local.length - 3)
+  return `${obfuscatedLocal}@${domain}`
 }

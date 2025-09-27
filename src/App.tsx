@@ -7,6 +7,8 @@ import PetitionDetail from './components/PetitionDetail'
 import HowItWorks from './components/HowItWorks'
 import UserProfile from './components/UserProfile'
 import EditPetition from './components/EditPetition'
+import TermsOfService from './components/TermsOfService'
+import PrivacyPolicy from './components/PrivacyPolicy'
 import Footer from './components/layout/Footer'
 import SignInPage from './components/auth/SignInPage'
 import AuthErrorPage from './components/auth/AuthErrorPage'
@@ -32,9 +34,13 @@ function App() {
               <Route path="/petition/:slug" element={<PetitionDetail />} />
               <Route path="/petition/:slug/edit" element={<EditPetition />} />
               <Route path="/proposals/:slug" element={<PetitionDetail />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/profile" element={<UserProfile />} />
+              <Route path="/petition/:slug/edit" element={<EditPetition />} />
+              <Route path="/terms" element={<TermsOfService />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/petitions" element={<AllPetitions />} />
               <Route path="/featured" element={<FeaturedPetitions />} />
-              <Route path="/profile" element={<UserProfile />} />
               <Route path="/auth/signin" element={<SignInPage />} />
               <Route path="/auth/error" element={<AuthErrorPage />} />
             </Routes>
