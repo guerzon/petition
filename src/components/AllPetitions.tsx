@@ -120,6 +120,7 @@ export default function AllPetitions() {
                 <Input
                   type="text"
                   placeholder="Search petitions..."
+                  className="w-full text-lg py-6 bg-white shadow-xs"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                 />
@@ -128,18 +129,21 @@ export default function AllPetitions() {
                 <Button
                   variant={filter === 'all' ? 'default' : 'outline'}
                   onClick={() => setFilter('all')}
+                  className="text-lg py-6"
                 >
                   All
                 </Button>
                 <Button
                   variant={filter === 'local' ? 'default' : 'outline'}
                   onClick={() => setFilter('local')}
+                  className="text-lg py-6"
                 >
                   Local
                 </Button>
                 <Button
                   variant={filter === 'national' ? 'default' : 'outline'}
                   onClick={() => setFilter('national')}
+                  className="text-lg py-6"
                 >
                   National
                 </Button>

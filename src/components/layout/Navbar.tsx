@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Menu, ChevronDown, Globe, Search } from 'lucide-react'
+import { X, Menu, ChevronDown, Globe } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LANGUAGES, type LanguageType } from '../../i18n/languages'
@@ -144,13 +144,13 @@ const Navbar: React.FC = () => {
             ))}
           </div>
           <div className="hidden lg:flex items-center space-x-6">
-            <Link
+            {/* <Link
               to="/search"
               className="flex items-center text-gray-700 hover:text-primary-600 font-medium transition-colors"
             >
               <Search className="h-4 w-4 mr-1" />
               {t('navbar.search')}
-            </Link>
+            </Link> */}
 
             {status === 'authenticated' ? (
               <UserProfile />
