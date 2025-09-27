@@ -12,7 +12,10 @@ export default function Hero() {
           <p className="text-xl md:text-2xl mb-8 text-blue-200">{t('subtitle')}</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/create">
-              <Button size="lg" className="bg-white text-primary-600 hover:bg-gray-100">
+              <Button
+                size="lg"
+                className="bg-white text-primary-600 hover:bg-gray-100 px-12 py-6 text-xl font-semibold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
+              >
                 Start a Petition
               </Button>
             </Link>
@@ -20,7 +23,7 @@ export default function Hero() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-white text-white hover:bg-white hover:text-primary-600"
+                className="border-white text-white hover:bg-white hover:text-primary-600 px-12 py-6 text-xl font-semibold rounded-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
               >
                 Browse Petitions
               </Button>
