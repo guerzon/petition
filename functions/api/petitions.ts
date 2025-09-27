@@ -1,6 +1,12 @@
 import type { CreatePetitionInput } from '../../src/db/schemas/types'
 import type { Env, EventContext } from '../_shared/types'
-import { handleCORS, createErrorResponse, createSuccessResponse, getDbService } from '../_shared/utils'
+import { 
+  handleCORS, 
+  createSuccessResponse, 
+  createCachedResponse,
+  createCachedErrorResponse,
+  getDbService 
+} from '../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
   const corsResponse = handleCORS(context.request, context.env)
@@ -25,17 +31,19 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
       // If userId is provided, get petitions for specific user
       if (userId) {
         const petitions = await db.getUserPetitions(userId)
-        return createSuccessResponse(petitions)
+        // Cache user petitions for 2 minutes (they change less frequently)
+        return createCachedResponse(petitions, context.request, context.env, 120)
       }
 
       // Otherwise get all petitions
       const petitions = await db.getAllPetitions(limit, offset, type)
-      return createSuccessResponse(petitions)
+      // Cache all petitions for 5 minutes
+      return createCachedResponse(petitions, context.request, context.env, 300)
     }
 
-    return createErrorResponse('Method not allowed', 405)
+    return createCachedErrorResponse('Method not allowed', context.request, context.env, 405)
   } catch (error) {
     console.error('Petitions API Error:', error)
-    return createErrorResponse(error)
+    return createCachedErrorResponse(error, context.request, context.env)
   }
 }

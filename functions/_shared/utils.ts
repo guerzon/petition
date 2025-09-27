@@ -115,3 +115,68 @@ export function createNotFoundResponse(message: string = 'Not found'): Response 
 export function getDbService(context: EventContext<Env>): DatabaseService {
   return new DatabaseService(context.env.DB)
 }
+
+// ETag and caching utilities
+export function generateETag(data: unknown): string {
+  // Simple hash function for ETag generation
+  const str = JSON.stringify(data)
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return `"${Math.abs(hash).toString(36)}"`
+}
+
+export function createCachedResponse(
+  data: unknown, 
+  request: Request, 
+  env: Env,
+  cacheMaxAge: number = 300 // 5 minutes default
+): Response {
+  const corsHeaders = getCorsHeaders(request, env)
+  const etag = generateETag(data)
+  
+  // Check if client has matching ETag
+  const clientETag = request.headers.get('If-None-Match')
+  if (clientETag === etag) {
+    return new Response(null, {
+      status: 304, // Not Modified
+      headers: {
+        ...corsHeaders,
+        'ETag': etag,
+        'Cache-Control': `public, max-age=${cacheMaxAge}`,
+      }
+    })
+  }
+  
+  return new Response(JSON.stringify(data), {
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'application/json',
+      'ETag': etag,
+      'Cache-Control': `public, max-age=${cacheMaxAge}`,
+      'Last-Modified': new Date().toUTCString(),
+    },
+  })
+}
+
+export function createCachedErrorResponse(
+  error: unknown, 
+  request: Request, 
+  env: Env, 
+  status: number = 500
+): Response {
+  const message = error instanceof Error ? error.message : 'Unknown error'
+  const corsHeaders = getCorsHeaders(request, env)
+  
+  return new Response(JSON.stringify({ error: message }), {
+    status,
+    headers: {
+      ...corsHeaders,
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+    },
+  })
+}

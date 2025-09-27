@@ -14,6 +14,7 @@ import ScrollToTop from './components/ScrollToTop'
 import { AuthProvider } from './hooks/useAuth'
 import { ModalProvider } from './contexts/ModalContext'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import './utils/cache-debug' // Initialize cache debugging in development
 
 function App() {
   return (

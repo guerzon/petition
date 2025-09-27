@@ -1,5 +1,11 @@
 import type { Env, EventContext } from '../_shared/types'
-import { handleCORS, createErrorResponseWithCors, createSuccessResponseWithCors, getDbService } from '../_shared/utils'
+import { 
+  handleCORS, 
+  createErrorResponseWithCors, 
+  createSuccessResponseWithCors, 
+  createCachedResponse,
+  getDbService 
+} from '../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
   const corsResponse = handleCORS(context.request, context.env)
@@ -10,7 +16,8 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
     
     if (context.request.method === 'GET') {
       const categories = await db.getAllCategories()
-      return createSuccessResponseWithCors(categories, context.request, context.env)
+      // Cache categories for 15 minutes (they rarely change)
+      return createCachedResponse(categories, context.request, context.env, 900)
     }
 
     if (context.request.method === 'POST') {

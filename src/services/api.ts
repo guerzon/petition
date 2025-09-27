@@ -12,6 +12,31 @@ import type {
 // API base URL - Vite Cloudflare plugin serves functions on same port
 const API_BASE_URL = '' // Always use relative URLs - Vite plugin handles routing
 
+// Simple in-memory cache for ETags
+interface CacheEntry {
+  data: unknown
+  etag: string
+  timestamp: number
+  maxAge: number
+}
+
+const cache = new Map<string, CacheEntry>()
+
+// Cache management utilities
+export const cacheUtils = {
+  clear: () => cache.clear(),
+  delete: (key: string) => cache.delete(key),
+  invalidatePattern: (pattern: string) => {
+    const regex = new RegExp(pattern)
+    for (const [key] of cache) {
+      if (regex.test(key)) {
+        cache.delete(key)
+      }
+    }
+  },
+  size: () => cache.size,
+}
+
 class ApiError extends Error {
   public status: number
   
@@ -22,8 +47,33 @@ class ApiError extends Error {
   }
 }
 
+function getCacheKey(endpoint: string, options: RequestInit = {}): string {
+  // Create a cache key based on endpoint and relevant options
+  const method = options.method || 'GET'
+  const body = options.body || ''
+  return `${method}:${endpoint}:${body}`
+}
+
+function isCacheValid(entry: CacheEntry): boolean {
+  const now = Date.now()
+  return (now - entry.timestamp) < (entry.maxAge * 1000)
+}
+
 async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
+  const cacheKey = getCacheKey(endpoint, options)
+  
+  // Only use cache for GET requests
+  if (!options.method || options.method === 'GET') {
+    const cachedEntry = cache.get(cacheKey)
+    if (cachedEntry && isCacheValid(cachedEntry)) {
+      // Add If-None-Match header for ETag validation
+      options.headers = {
+        ...options.headers,
+        'If-None-Match': cachedEntry.etag,
+      }
+    }
+  }
 
   const response = await fetch(url, {
     headers: {
@@ -33,12 +83,42 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     ...options,
   })
 
+  // Handle 304 Not Modified - return cached data
+  if (response.status === 304) {
+    const cachedEntry = cache.get(cacheKey)
+    if (cachedEntry) {
+      // Type assertion: we trust that cached data matches the expected return type
+      return cachedEntry.data as T
+    }
+  }
+
   if (!response.ok) {
     const errorText = await response.text()
     throw new ApiError(response.status, errorText || `HTTP ${response.status}`)
   }
 
-  return await response.json()
+  const data = await response.json()
+  
+  // Cache successful GET responses with ETag
+  if ((!options.method || options.method === 'GET') && response.status === 200) {
+    const etag = response.headers.get('ETag')
+    const cacheControl = response.headers.get('Cache-Control')
+    
+    if (etag && cacheControl) {
+      // Parse max-age from Cache-Control header
+      const maxAgeMatch = cacheControl.match(/max-age=(\d+)/)
+      const maxAge = maxAgeMatch ? parseInt(maxAgeMatch[1]) : 300 // Default 5 minutes
+      
+      cache.set(cacheKey, {
+        data,
+        etag,
+        timestamp: Date.now(),
+        maxAge,
+      })
+    }
+  }
+
+  return data as T
 }
 
 // User API
@@ -62,10 +142,15 @@ export const userApi = {
 // Petition API
 export const petitionApi = {
   async create(petitionData: CreatePetitionInput): Promise<Petition> {
-    return apiRequest<Petition>('/api/petitions', {
+    const result = await apiRequest<Petition>('/api/petitions', {
       method: 'POST',
       body: JSON.stringify(petitionData),
     })
+    
+    // Invalidate petition list caches after creating a new petition
+    cacheUtils.invalidatePattern('GET:/api/petitions')
+    
+    return result
   },
 
   async getById(id: number): Promise<PetitionWithDetails> {
@@ -112,20 +197,32 @@ export const petitionApi = {
   },
 
   async update(id: number, petitionData: Partial<CreatePetitionInput>): Promise<Petition> {
-    return apiRequest<Petition>(`/api/petitions/${id}`, {
+    const result = await apiRequest<Petition>(`/api/petitions/${id}`, {
       method: 'PUT',
       body: JSON.stringify(petitionData),
     })
+    
+    // Invalidate related caches after updating a petition
+    cacheUtils.invalidatePattern('GET:/api/petitions')
+    cacheUtils.delete(`GET:/api/petitions/${id}:`)
+    
+    return result
   },
 }
 
 // Signature API
 export const signatureApi = {
   async create(signatureData: CreateSignatureInput): Promise<Signature> {
-    return apiRequest<Signature>('/api/signatures', {
+    const result = await apiRequest<Signature>('/api/signatures', {
       method: 'POST',
       body: JSON.stringify(signatureData),
     })
+    
+    // Invalidate petition caches since signature count changed
+    cacheUtils.invalidatePattern('GET:/api/petitions')
+    cacheUtils.invalidatePattern('GET:/api/petition/')
+    
+    return result
   },
 
   async getUserSignatures(userId: number): Promise<Signature[]> {

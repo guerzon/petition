@@ -1,5 +1,10 @@
 import type { Env, EventContext } from '../../_shared/types'
-import { handleCORS, createErrorResponse, createSuccessResponse, createNotFoundResponse, getDbService } from '../../_shared/utils'
+import { 
+  handleCORS, 
+  createCachedResponse,
+  createCachedErrorResponse,
+  getDbService 
+} from '../../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
   const corsResponse = handleCORS(context.request, context.env)
@@ -10,20 +15,21 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
     const slug = context.params.slug
     
     if (!slug || slug.trim() === '') {
-      return createErrorResponse('Invalid petition slug', 400)
+      return createCachedErrorResponse('Invalid petition slug', context.request, context.env, 400)
     }
 
     if (context.request.method === 'GET') {
       const petition = await db.getPetitionBySlug(slug)
       if (!petition) {
-        return createNotFoundResponse('Petition not found')
+        return createCachedErrorResponse('Petition not found', context.request, context.env, 404)
       }
-      return createSuccessResponse(petition)
+      // Cache petition by slug for 10 minutes (accessed frequently)
+      return createCachedResponse(petition, context.request, context.env, 600)
     }
 
-    return createErrorResponse('Method not allowed', 405)
+    return createCachedErrorResponse('Method not allowed', context.request, context.env, 405)
   } catch (error) {
     console.error('Petition by slug API Error:', error)
-    return createErrorResponse(error)
+    return createCachedErrorResponse(error, context.request, context.env)
   }
 }
