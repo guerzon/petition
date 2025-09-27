@@ -33,7 +33,16 @@ export default function PetitionCard({
   const hasSigned = isAuthenticated && hasSignedPetition(petition.id)
 
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full">
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow flex flex-col h-full relative">
+      {/* Signed Ribbon */}
+      {hasSigned && (
+        <div className="absolute top-0 right-0 z-10">
+          <div className="bg-green-600 text-white text-xs font-bold px-8 py-1 transform rotate-45 translate-x-6 translate-y-4 shadow-md">
+            SIGNED
+          </div>
+        </div>
+      )}
+      
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start mb-2">
           <div className="flex gap-1 flex-wrap">
@@ -44,29 +53,18 @@ export default function PetitionCard({
               </Badge>
             )}
           </div>
-          {showSignedStatus && hasSigned ? (
-            <div className="flex items-center gap-1 bg-green-100 text-green-700 px-2 py-1 rounded-full">
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                <path
-                  fillRule="evenodd"
-                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <span className="text-xs font-medium">Signed</span>
-            </div>
-          ) : (
-            <span className="text-sm text-gray-500">{daysLeft} days left</span>
-          )}
         </div>
         <CardTitle className="text-xl font-semibold line-clamp-2 font-[Figtree]">
           <Link to={`/petition/${petition.slug}`} className="hover:text-blue-600 transition-colors">
             {petition.title}
           </Link>
+
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col flex-grow">
-        <p className="text-gray-800 mb-4 line-clamp-3">{petition.description}</p>
+        <p className="text-gray-800 line-clamp-3">{petition.description}
+        </p>
+            <p className="text-sm text-gray-800 my-3">{daysLeft} days left</p>
 
         {petition.type === 'local' && petition.location && (
           <p className="text-sm text-blue-600 mb-2">📍 {petition.location}</p>
@@ -88,7 +86,7 @@ export default function PetitionCard({
 
         <Link to={`/petition/${petition.slug}`} className="mt-auto">
           <Button className="w-full text-white">
-            {hasSigned ? 'View Petition' : 'View & Sign Petition'}
+            {hasSigned ? 'View Petition' : 'Sign Petition'}
           </Button>
         </Link>
       </CardContent>
