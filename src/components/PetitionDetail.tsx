@@ -187,19 +187,19 @@ export default function PetitionDetail() {
       <meta property="og:title" content={petition.title} />
       <meta property="og:description" content={petition.description.slice(0, 160)} />
       <meta property="og:type" content="article" />
-      <meta property="og:url" content={`https://petition.example.com/petition/${petition.slug}`} />
+      <meta property="og:url" content={`https://petition.ph/petition/${petition.slug}`} />
       <meta
         property="og:image"
-        content={petition.image_url || 'https://petition.example.com/og-image.jpg'}
+        content={petition.image_url || 'https://petition.ph/bettergov-og.jpg'}
       />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={petition.title} />
       <meta name="twitter:description" content={petition.description.slice(0, 160)} />
       <meta
         name="twitter:image"
-        content={petition.image_url || 'https://petition.example.com/og-image.jpg'}
+        content={petition.image_url || 'https://petition.ph/bettergov-og.jpg'}
       />
-      <link rel="canonical" href={`https://petition.example.com/petition/${petition.slug}`} />
+      <link rel="canonical" href={`https://petition.ph/petition/${petition.slug}`} />
 
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
