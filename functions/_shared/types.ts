@@ -7,6 +7,8 @@ export interface Env {
   GOOGLE_CLIENT_SECRET: string
   FACEBOOK_CLIENT_ID: string
   FACEBOOK_CLIENT_SECRET: string
+  ENVIRONMENT?: string
+  NODE_ENV?: string
 }
 
 export interface EventContext<E = unknown> {

@@ -12,6 +12,7 @@ import { onRequest as petitionSignaturesHandler } from './api/petitions/[id]/sig
 import { onRequest as signaturesHandler } from './api/signatures'
 import { onRequest as categoriesHandler } from './api/categories'
 import { onRequest as authHandler } from './auth/[...auth]'
+import { getCorsHeaders, handleCORS } from './_shared/utils'
 
 function createContext(request: Request, env: Env, params: Record<string, string> = {}): EventContext<Env> {
   return {
@@ -45,12 +46,24 @@ export default {
     const url = new URL(request.url)
     const path = url.pathname
 
+    // Handle preflight OPTIONS requests
+    const corsResponse = handleCORS(request, env)
+    if (corsResponse) {
+      return corsResponse
+    }
+
     try {
       // Route to appropriate function handler
 
       // Auth routes - handle all /auth/* paths
       if (path.startsWith('/auth/')) {
-        return await authHandler(createContext(request, env))
+        const response = await authHandler(createContext(request, env))
+        // Add CORS headers to auth responses
+        const corsHeaders = getCorsHeaders(request, env)
+        Object.entries(corsHeaders).forEach(([key, value]) => {
+          response.headers.set(key, value)
+        })
+        return response
       }
 
       if (path === '/api/test') {
@@ -94,25 +107,21 @@ export default {
       }
 
       // 404 for unmatched routes
+      const corsHeaders = getCorsHeaders(request, env)
       return new Response('Not Found', { 
         status: 404,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
+        headers: corsHeaders
       })
 
     } catch (error: unknown) {
       console.error('Router Error:', error)
       const message = error instanceof Error ? error.message : 'Unknown error'
+      const corsHeaders = getCorsHeaders(request, env)
       return new Response(JSON.stringify({ error: message }), {
         status: 500,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          ...corsHeaders
         },
       })
     }

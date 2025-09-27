@@ -1,8 +1,8 @@
 import type { Env, EventContext } from '../_shared/types'
-import { handleCORS, createErrorResponse, createSuccessResponse, getDbService } from '../_shared/utils'
+import { handleCORS, createErrorResponseWithCors, createSuccessResponseWithCors, getDbService } from '../_shared/utils'
 
 export const onRequest = async (context: EventContext<Env>): Promise<Response> => {
-  const corsResponse = handleCORS(context.request)
+  const corsResponse = handleCORS(context.request, context.env)
   if (corsResponse) return corsResponse
 
   try {
@@ -10,21 +10,21 @@ export const onRequest = async (context: EventContext<Env>): Promise<Response> =
     
     if (context.request.method === 'GET') {
       const categories = await db.getAllCategories()
-      return createSuccessResponse(categories)
+      return createSuccessResponseWithCors(categories, context.request, context.env)
     }
 
     if (context.request.method === 'POST') {
       const body = await context.request.json() as { name: string; description?: string }
       if (!body.name) {
-        return createErrorResponse('Category name is required', 400)
+        return createErrorResponseWithCors('Category name is required', context.request, context.env, 400)
       }
       const category = await db.createCategory(body.name, body.description)
-      return createSuccessResponse(category)
+      return createSuccessResponseWithCors(category, context.request, context.env)
     }
 
-    return createErrorResponse('Method not allowed', 405)
+    return createErrorResponseWithCors('Method not allowed', context.request, context.env, 405)
   } catch (error) {
     console.error('Categories API Error:', error)
-    return createErrorResponse(error)
+    return createErrorResponseWithCors(error, context.request, context.env)
   }
 }
