@@ -4,7 +4,7 @@ import PetitionsList from './PetitionsList'
 export default function HomePage() {
   return (
     <>
-      <title>Petition by BetterGov.ph - Start and Support Meaningful Change</title>
+      <title>Petitions by BetterGov.ph - Start and Support Meaningful Change</title>
       <meta
         name="description"
         content="Create, sign, and share petitions that matter. Join thousands of advocates making a difference in their communities and beyond. Start your petition today and be the change you want to see."
@@ -16,7 +16,7 @@ export default function HomePage() {
       <meta name="author" content="BetterGov.ph" />
       <meta
         property="og:title"
-        content="Petition by BetterGov.ph - Start and Support Meaningful Change"
+        content="Petitions by BetterGov.ph - Start and Support Meaningful Change"
       />
       <meta
         property="og:description"
@@ -28,7 +28,7 @@ export default function HomePage() {
       <meta name="twitter:card" content="summary_large_image" />
       <meta
         name="twitter:title"
-        content="Petition by BetterGov.ph - Start and Support Meaningful Change"
+        content="Petitions by BetterGov.ph - Start and Support Meaningful Change"
       />
       <meta
         name="twitter:description"
