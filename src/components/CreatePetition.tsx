@@ -6,7 +6,7 @@ import { Input } from './ui/input'
 import { Badge } from './ui/badge'
 import { petitionApi, categoryApi, ApiError } from '../services/api'
 import type { Category } from '../types/api'
-import MDEditor from '@uiw/react-md-editor'
+import MDEditor, { commands } from '@uiw/react-md-editor'
 import { useAuth, type Session } from '../hooks/useAuth'
 import { useModal } from '../contexts/ModalContext'
 import { useTranslation } from 'react-i18next'
@@ -150,7 +150,7 @@ export default function CreatePetition() {
 
   const handleInputChange = (
     field: keyof CreatePetitionFormData,
-    value: string | number | string[] | File | null
+    value: string | number | number[] | File | null
   ) => {
     setFormData(prev => ({
       ...prev,
@@ -196,7 +196,7 @@ export default function CreatePetition() {
       ? formData.categories.filter(id => id !== categoryId)
       : [...formData.categories, categoryId]
 
-    handleInputChange('categories', updatedCategories.map(String))
+    handleInputChange('categories', updatedCategories)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -496,7 +496,19 @@ export default function CreatePetition() {
                     placeholder: t('create.descriptionPlaceholder'),
                     style: { minHeight: '200px', maxHeight: '400px' },
                   }}
-                  style={{ border: '1px solid #ccc', borderRadius: '0' }}
+                  data-color-mode="light"
+                  commands={[
+                    commands.bold,
+                    commands.italic,
+                    commands.unorderedListCommand,
+                    commands.orderedListCommand,
+                    commands.link
+                  ]}
+                  style={{ 
+                    border: '1px solid #ccc', 
+                    borderRadius: '0',
+                    backgroundColor: 'white'
+                  }}
                   height={300}
                 />
               </div>
