@@ -143,11 +143,8 @@ export default function UserProfile() {
               </div>
               <div className="flex-1">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  {session.user.name || session.user.email}
+                  {session.user.name || 'User'}
                 </h1>
-                {session.user.name && session.user.email && (
-                  <p className="text-gray-600 mb-4">{session.user.email}</p>
-                )}
                 <div className="flex flex-wrap gap-4">
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <BarChart3 className="w-4 h-4" />

@@ -40,11 +40,11 @@ export default function UserProfile() {
           />
         ) : (
           <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-medium">
-            {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase() || 'U'}
+            {user.name?.charAt(0)?.toUpperCase() || 'U'}
           </div>
         )}
         <span className="text-sm font-medium text-gray-900 hidden md:block">
-          {user.name || user.email}
+          {user.name || 'User'}
         </span>
       </button>
 
@@ -57,8 +57,8 @@ export default function UserProfile() {
           <Card className="absolute right-0 top-full mt-2 w-56 z-20 shadow-lg border border-gray-200 bg-white">
             <CardContent className="p-4">
               <div className="border-b border-gray-200 pb-3 mb-3">
-                <p className="font-medium text-gray-900">{user.name}</p>
-                <p className="text-sm text-gray-500">{user.email}</p>
+                <p className="font-medium text-gray-900">{user.name || 'User'}</p>
+
               </div>
               <div className="space-y-2">
                 <Link
