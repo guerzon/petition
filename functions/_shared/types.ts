@@ -8,6 +8,7 @@ export interface Env {
   GOOGLE_CLIENT_SECRET: string
   FACEBOOK_CLIENT_ID: string
   FACEBOOK_CLIENT_SECRET: string
+  EMAIL_ENCRYPTION_KEY?: string
   ENVIRONMENT?: string
   NODE_ENV?: string
 }

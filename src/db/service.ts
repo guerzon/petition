@@ -13,16 +13,22 @@ import type {
   CreateSignatureInput,
   PetitionWithDetails,
 } from './schemas/types'
+import { emailUtils } from '../utils/encryption'
 
 export class DatabaseService {
   private db: D1Database
+  private env?: { EMAIL_ENCRYPTION_KEY?: string }
 
-  constructor(db: D1Database) {
+  constructor(db: D1Database, env?: { EMAIL_ENCRYPTION_KEY?: string }) {
     this.db = db
+    this.env = env
   }
 
   // User methods
   async createUser(userData: CreateUserInput): Promise<User> {
+    // Encrypt email before storing
+    const encryptedEmail = await emailUtils.encryptForStorage(userData.email, this.env)
+    
     const stmt = this.db.prepare(`
       INSERT INTO users (name, email, emailVerified, image)
       VALUES (?, ?, ?, ?)
@@ -30,24 +36,50 @@ export class DatabaseService {
     `)
 
     const result = await stmt
-      .bind(userData.name || null, userData.email, userData.emailVerified || null, userData.image || null)
+      .bind(userData.name || null, encryptedEmail, userData.emailVerified || null, userData.image || null)
       .first<User>()
 
     if (!result) {
       throw new Error('Failed to create user')
     }
 
-    return result
+    // Decrypt email for return value
+    const decryptedResult = {
+      ...result,
+      email: await emailUtils.decryptFromStorage(result.email, this.env)
+    }
+
+    return decryptedResult
   }
 
   async getUserById(id: string): Promise<User | null> {
     const stmt = this.db.prepare('SELECT * FROM users WHERE id = ?')
-    return await stmt.bind(id).first<User>()
+    const result = await stmt.bind(id).first<User>()
+    
+    if (!result) return null
+    
+    // Decrypt email for return value
+    return {
+      ...result,
+      email: await emailUtils.decryptFromStorage(result.email, this.env)
+    }
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
-    const stmt = this.db.prepare('SELECT * FROM users WHERE email = ?')
-    return await stmt.bind(email).first<User>()
+    // For email lookup, we need to check both encrypted and unencrypted versions
+    // This handles migration scenarios where some emails might still be unencrypted
+    const encryptedEmail = await emailUtils.encryptForStorage(email, this.env)
+    
+    const stmt = this.db.prepare('SELECT * FROM users WHERE email = ? OR email = ?')
+    const result = await stmt.bind(email, encryptedEmail).first<User>()
+    
+    if (!result) return null
+    
+    // Decrypt email for return value
+    return {
+      ...result,
+      email: await emailUtils.decryptFromStorage(result.email, this.env)
+    }
   }
 
   // Helper method to generate URL-friendly slug
@@ -150,12 +182,15 @@ export class DatabaseService {
     `)
     const categoriesResult = await categoriesStmt.bind(petition.id).all<Category>()
 
+    // Decrypt creator email
+    const decryptedCreatorEmail = await emailUtils.decryptFromStorage(petition.creator_email, this.env)
+    
     // Use the cached current_count from the petitions table
     return {
       ...petition,
       creator: {
         name: petition.creator_name,
-        email: petition.creator_email,
+        email: decryptedCreatorEmail,
       },
       categories: categoriesResult.results || [],
     }
@@ -192,12 +227,15 @@ export class DatabaseService {
     `)
     const categoriesResult = await categoriesStmt.bind(id).all<Category>()
 
+    // Decrypt creator email
+    const decryptedCreatorEmail = await emailUtils.decryptFromStorage(petition.creator_email, this.env)
+    
     // Use the cached current_count from the petitions table
     return {
       ...petition,
       creator: {
         name: petition.creator_name,
-        email: petition.creator_email,
+        email: decryptedCreatorEmail,
       },
       categories: categoriesResult.results || [],
     }
@@ -252,11 +290,14 @@ export class DatabaseService {
       `)
       const categoriesResult = await categoriesStmt.bind(petition.id).all<Category>()
 
+      // Decrypt creator email
+      const decryptedCreatorEmail = await emailUtils.decryptFromStorage(petition.creator_email, this.env)
+      
       petitionsWithDetails.push({
         ...petition,
         creator: {
           name: petition.creator_name,
-          email: petition.creator_email,
+          email: decryptedCreatorEmail,
         },
         categories: categoriesResult.results || [],
       })
