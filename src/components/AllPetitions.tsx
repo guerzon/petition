@@ -71,7 +71,7 @@ export default function AllPetitions() {
 
   return (
     <>
-      <title>All Petitions | Petition by BetterGov.ph</title>
+      <title>All Petitions | Petitions by BetterGov.ph</title>
       <meta
         name="description"
         content="Browse and support petitions that matter to you. Discover local and national campaigns for social change, community activism, and civic engagement."
@@ -80,8 +80,8 @@ export default function AllPetitions() {
         name="keywords"
         content="browse petitions, find petitions, social change campaigns, community activism, civic engagement, local petitions, national petitions, advocacy"
       />
-      <meta name="author" content="Petition by BetterGov.ph" />
-      <meta property="og:title" content="All Petitions | Petition by BetterGov.ph" />
+      <meta name="author" content="Petitions by BetterGov.ph" />
+      <meta property="og:title" content="All Petitions | Petitions by BetterGov.ph" />
       <meta
         property="og:description"
         content="Browse and support petitions that matter to you. Discover local and national campaigns for change."
@@ -90,7 +90,7 @@ export default function AllPetitions() {
       <meta property="og:url" content="https://petition.ph/petitions" />
       <meta property="og:image" content="https://petition.ph/og-image.jpg" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content="All Petitions | Petition by BetterGov.ph" />
+      <meta name="twitter:title" content="All Petitions | Petitions by BetterGov.ph" />
       <meta
         name="twitter:description"
         content="Browse and support petitions that matter to you. Discover local and national campaigns for change."

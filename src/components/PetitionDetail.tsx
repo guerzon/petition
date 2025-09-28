@@ -185,11 +185,11 @@ function PetitionDetailContent() {
 
   return (
     <>
-      <title>{`${petition.title} | Petition By BetterGov.ph`}</title>
+      <title>{`${petition.title} | Petitions by BetterGov.ph`}</title>
       <meta name="description" content={petition.description.slice(0, 160)} />
       <meta name="keywords" content={petition.categories.map(cat => cat.name).join(', ')} />
       <meta name="author" content={petition.creator.name} />
-      <meta property="og:title" content={`${petition.title} | Petition By BetterGov.ph`} />
+      <meta property="og:title" content={`${petition.title} | Petitions by BetterGov.ph`} />
       <meta property="og:description" content={petition.description.slice(0, 160)} />
       <meta property="og:type" content="article" />
       <meta property="og:url" content={`https://petition.ph/petition/${petition.slug}`} />
