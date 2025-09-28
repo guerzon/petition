@@ -772,11 +772,9 @@ export default function CreatePetition() {
                   )}
                   <div>
                     <p className="font-medium text-green-900">
-                      {session.user.name || session.user.email}
+                      {session.user.name || 'User'}
                     </p>
-                    {session.user.name && session.user.email && (
-                      <p className="text-sm text-green-700">{session.user.email}</p>
-                    )}
+
                   </div>
                 </div>
               </div>

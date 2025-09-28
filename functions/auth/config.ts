@@ -1,8 +1,8 @@
-import { D1Adapter } from '@auth/d1-adapter'
 import type { AuthConfig } from '@auth/core'
 import Google from '@auth/core/providers/google'
 import Facebook from '@auth/core/providers/facebook'
 import type { Env } from '../_shared/types'
+import { EncryptedD1Adapter } from './encrypted-d1-adapter'
 
 export function createAuthConfig(env: Env): AuthConfig {
   const providers = []
@@ -38,7 +38,7 @@ export function createAuthConfig(env: Env): AuthConfig {
   }
 
   const config: AuthConfig = {
-    adapter: D1Adapter(env.DB),
+    adapter: EncryptedD1Adapter(env.DB, env),
     providers,
     callbacks: {
       async signIn({ user, account, profile }) {
@@ -60,7 +60,7 @@ export function createAuthConfig(env: Env): AuthConfig {
         if (session?.user && user) {
           session.user.id = user.id
           session.user.name = user.name
-
+          // Note: user.email is already decrypted by our EncryptedD1Adapter
           session.user.email = obfuscateEmail(user.email)
           session.user.image = user.image
         }

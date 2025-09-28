@@ -131,7 +131,7 @@ export default function SignPetitionModal({
                       />
                     )}
                     <span className="text-green-700 font-medium">
-                      {session.user.name || session.user.email}
+                      {session.user.name || 'User'}
                     </span>
                   </div>
                 </div>

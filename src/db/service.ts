@@ -43,26 +43,12 @@ export class DatabaseService {
       throw new Error('Failed to create user')
     }
 
-    // Decrypt email for return value
-    const decryptedResult = {
-      ...result,
-      email: await emailUtils.decryptFromStorage(result.email, this.env)
-    }
-
-    return decryptedResult
+    return result
   }
 
   async getUserById(id: string): Promise<User | null> {
     const stmt = this.db.prepare('SELECT * FROM users WHERE id = ?')
-    const result = await stmt.bind(id).first<User>()
-    
-    if (!result) return null
-    
-    // Decrypt email for return value
-    return {
-      ...result,
-      email: await emailUtils.decryptFromStorage(result.email, this.env)
-    }
+    return await stmt.bind(id).first<User>()
   }
 
   async getUserByEmail(email: string): Promise<User | null> {
@@ -71,15 +57,7 @@ export class DatabaseService {
     const encryptedEmail = await emailUtils.encryptForStorage(email, this.env)
     
     const stmt = this.db.prepare('SELECT * FROM users WHERE email = ? OR email = ?')
-    const result = await stmt.bind(email, encryptedEmail).first<User>()
-    
-    if (!result) return null
-    
-    // Decrypt email for return value
-    return {
-      ...result,
-      email: await emailUtils.decryptFromStorage(result.email, this.env)
-    }
+    return await stmt.bind(email, encryptedEmail).first<User>()
   }
 
   // Helper method to generate URL-friendly slug
@@ -182,15 +160,12 @@ export class DatabaseService {
     `)
     const categoriesResult = await categoriesStmt.bind(petition.id).all<Category>()
 
-    // Decrypt creator email
-    const decryptedCreatorEmail = await emailUtils.decryptFromStorage(petition.creator_email, this.env)
-    
     // Use the cached current_count from the petitions table
     return {
       ...petition,
       creator: {
         name: petition.creator_name,
-        email: decryptedCreatorEmail,
+        email: petition.creator_email,
       },
       categories: categoriesResult.results || [],
     }
@@ -227,15 +202,12 @@ export class DatabaseService {
     `)
     const categoriesResult = await categoriesStmt.bind(id).all<Category>()
 
-    // Decrypt creator email
-    const decryptedCreatorEmail = await emailUtils.decryptFromStorage(petition.creator_email, this.env)
-    
     // Use the cached current_count from the petitions table
     return {
       ...petition,
       creator: {
         name: petition.creator_name,
-        email: decryptedCreatorEmail,
+        email: petition.creator_email,
       },
       categories: categoriesResult.results || [],
     }
@@ -290,14 +262,11 @@ export class DatabaseService {
       `)
       const categoriesResult = await categoriesStmt.bind(petition.id).all<Category>()
 
-      // Decrypt creator email
-      const decryptedCreatorEmail = await emailUtils.decryptFromStorage(petition.creator_email, this.env)
-      
       petitionsWithDetails.push({
         ...petition,
         creator: {
           name: petition.creator_name,
-          email: decryptedCreatorEmail,
+          email: petition.creator_email,
         },
         categories: categoriesResult.results || [],
       })
